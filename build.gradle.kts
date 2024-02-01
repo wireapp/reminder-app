@@ -23,6 +23,7 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
+    implementation("com.rubiconproject.oss:jchronic:0.2.8")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
