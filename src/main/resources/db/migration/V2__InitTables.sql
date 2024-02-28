@@ -1,0 +1,34 @@
+-- Drop the tables and components if they exist
+DROP TABLE IF EXISTS REMINDERS;
+DROP SEQUENCE IF EXISTS REMINDERS_SEQ;
+DROP TABLE IF EXISTS TOKENS;
+DROP SEQUENCE IF EXISTS TOKENS_SEQ;
+
+-- Create the reminders table
+CREATE SEQUENCE REMINDERS_SEQ start 1 increment 1;
+CREATE TABLE REMINDERS (
+    id int8 NOT NULL,
+    createdAt TIMESTAMP,
+    taskId VARCHAR(120) NOT NULL,
+    conversationId VARCHAR(120),
+    task VARCHAR(250),
+    scheduledAt TIMESTAMP,
+    isEternal BOOL DEFAULT FALSE,
+    PRIMARY KEY (id)
+);
+CREATE INDEX IDX_REMINDERS_CONVERSATION_ID ON REMINDERS (conversationId);
+CREATE INDEX IDX_REMINDERS_TASK_ID ON REMINDERS (taskId);
+
+-- Create the tokens table
+CREATE SEQUENCE TOKENS_SEQ start 1 increment 1;
+CREATE TABLE TOKENS (
+    id int8 NOT NULL,
+    conversationId VARCHAR(120) NOT NULL,
+    token VARCHAR(500) NOT NULL,
+    createdAt TIMESTAMP NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE INDEX IDX_TOKENS_CONVERSATION_ID ON TOKENS (conversationId);
+
+-- Dummy query alive check
+SELECT 1;

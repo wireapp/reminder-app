@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.allopen") version "1.9.22"
+    kotlin("plugin.noarg") version "1.9.22"
     id("io.quarkus")
 }
 
@@ -13,6 +14,7 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
+// todo move to catalog
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-flyway")
@@ -21,9 +23,11 @@ dependencies {
     implementation("io.quarkus:quarkus-resteasy")
     implementation("io.quarkus:quarkus-resteasy-jackson")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
+    implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("com.rubiconproject.oss:jchronic:0.2.8")
+    implementation("io.arrow-kt:arrow-core:1.2.0-RC")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
@@ -44,6 +48,10 @@ allOpen {
     annotation("jakarta.enterprise.context.ApplicationScoped")
     annotation("jakarta.persistence.Entity")
     annotation("io.quarkus.test.junit.QuarkusTest")
+}
+
+noArg {
+    annotation("jakarta.persistence.Entity")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
