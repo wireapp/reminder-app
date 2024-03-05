@@ -1,5 +1,7 @@
-package com.wire.bots.domain
+package com.wire.bots.domain.reminder
 
+import com.wire.bots.domain.PlainConversationId
+import com.wire.bots.domain.TaskId
 import java.time.Instant
 
 data class Reminder(

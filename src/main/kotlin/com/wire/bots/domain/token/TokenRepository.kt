@@ -1,4 +1,6 @@
-package com.wire.bots.domain
+package com.wire.bots.domain.token
+
+import com.wire.bots.domain.PlainConversationId
 
 interface TokenRepository {
     fun insertToken(conversationId: PlainConversationId, newToken: String)

@@ -1,5 +1,9 @@
 package com.wire.bots.application
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
 data class Event(
     val type: EventType,
     val botId: String,
@@ -15,6 +19,7 @@ data class Event(
     val emoji: String? = null,
 )
 
+@Serializable
 data class TextContent(
     val data: String,
     @Transient val mentions: List<String> = emptyList() // todo: map later or never.

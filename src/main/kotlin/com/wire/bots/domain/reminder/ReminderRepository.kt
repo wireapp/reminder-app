@@ -1,4 +1,4 @@
-package com.wire.bots.domain
+package com.wire.bots.domain.reminder
 
 interface ReminderRepository {
 

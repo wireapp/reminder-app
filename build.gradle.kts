@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.allopen") version "1.9.22"
     kotlin("plugin.noarg") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
     id("io.quarkus")
 }
 
@@ -20,8 +21,10 @@ dependencies {
     implementation("io.quarkus:quarkus-flyway")
     implementation("io.quarkus:quarkus-quartz")
     implementation("io.quarkus:quarkus-kotlin")
-    implementation("io.quarkus:quarkus-resteasy")
-    implementation("io.quarkus:quarkus-resteasy-jackson")
+    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
+    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
+    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
+    implementation("io.quarkus:quarkus-websockets-client")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

@@ -1,8 +1,11 @@
 package com.wire.bots.application
 
-import com.wire.bots.domain.Reminder
-import com.wire.bots.domain.ReminderRepository
+import com.wire.bots.domain.reminder.Reminder
+import com.wire.bots.domain.reminder.ReminderRepository
 import com.wire.bots.infrastructure.jobs.ReminderJob
+import io.smallrye.common.annotation.Blocking
+import io.smallrye.mutiny.Uni
+import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
@@ -19,8 +22,8 @@ import org.quartz.TriggerBuilder
 import org.quartz.impl.matchers.GroupMatcher
 import org.slf4j.LoggerFactory
 
-
 @Path("/hello")
+@ApplicationScoped
 class GreetingResource {
 
     val logger = LoggerFactory.getLogger(GreetingResource::class.java)
@@ -31,9 +34,11 @@ class GreetingResource {
     @Inject
     lateinit var reminderRepository: ReminderRepository // todo change to usecase
 
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    fun hello(): String {
+    @Blocking
+    fun hello(): Uni<String> {
         // first, persist in db the task (todo, save token)
         val newTaskId = UUID.randomUUID().toString()
         val reminder = Reminder(
@@ -64,7 +69,7 @@ class GreetingResource {
         quartz.scheduleJob(job, trigger)
 
         logger.info("Scheduled jobs: ${quartz.getJobKeys(GroupMatcher.anyGroup())}")
-        return "Hello RESTEasy"
+        return "Hello RESTEasy".let { Uni.createFrom().item(it) }
     }
 
 }

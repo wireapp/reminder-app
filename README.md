@@ -9,7 +9,7 @@ This is a bot that can create reminders for you and your group, and send you a m
 
 ### The basics of `/remind` command:
 
-- `/remind ["what"] ["when"]`: Sets a reminder for the group conversation, the reminder will be sent to the group when it's due.
+- `/remind.new ["what"] ["when"]`: Sets a reminder for the group conversation, the reminder will be sent to the group when it's due.
 
 ### `"When"` syntax or setting the time for the reminder:
 
@@ -23,19 +23,19 @@ This is a bot that can create reminders for you and your group, and send you a m
 
 ### Examples:
 
-|                    | Command   | What                                                | When                  |
-|--------------------|-----------|-----------------------------------------------------|-----------------------|
-| one time reminder  | `/remind` | `"Remember to fill in your invoices by end of day"` | `"tomorrow"`          |
-| recurrent reminder | `/remind` | `"Join the daily stand-up"`                         | `"every day at 10am"` |
+|                    | Command       | What                                                | When                  |
+|--------------------|---------------|-----------------------------------------------------|-----------------------|
+| one time reminder  | `/remind.new` | `"Remember to fill in your invoices by end of day"` | `"tomorrow"`          |
+| recurrent reminder | `/remind.new` | `"Join the daily stand-up"`                         | `"every day at 10am"` |
 
 > [!TIP]  
 > You can set reminders for yourself. To do so, you can use the commands in a private conversation, a 1:1 with the bot.
 
 ### Other helpful commands:
 
-- `/remind help` (displays help about command usage)
-- `/remind list` (list the active reminders set in the conversation)
-- `/remind delete [reminder-identifier]` (deletes the target reminder, the identifier can be obtained from the list
+- `/remind.help` (displays help about command usage)
+- `/remind.list` (list the active reminders set in the conversation)
+- `/remind.delete [reminder-identifier]` (deletes the target reminder, the identifier can be obtained from the list
   command)
 
 ## Technical details

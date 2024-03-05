@@ -1,38 +1,39 @@
 package com.wire.bots.application
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
 
 enum class EventType {
-    @JsonProperty("conversation.bot_request")
+
+    @SerialName("conversation.bot_request")
     BOT_REQUEST,
 
-    @JsonProperty("conversation.bot_removed")
+    @SerialName("conversation.bot_removed")
     BOT_REMOVED,
 
-    @JsonProperty("conversation.init")
+    @SerialName("conversation.init")
     CONVERSATION_INIT,
 
-    @JsonProperty("conversation.new_text")
+    @SerialName("conversation.new_text")
     NEW_TEXT,
 
-    @JsonProperty("conversation.image.preview")
+    @SerialName("conversation.image.preview")
     IMAGE_PREVIEW,
 
-    @JsonProperty("conversation.file.preview")
+    @SerialName("conversation.file.preview")
     FILE_PREVIEW,
 
-    @JsonProperty("conversation.audio.preview")
+    @SerialName("conversation.audio.preview")
     AUDIO_PREVIEW,
 
-    @JsonProperty("conversation.asset.data")
+    @SerialName("conversation.asset.data")
     ASSET_DATA,
 
-    @JsonProperty("conversation.poll.action")
+    @SerialName("conversation.poll.action")
     POLL_ACTION,
 
-    @JsonProperty("conversation.user_joined")
+    @SerialName("conversation.user_joined")
     USER_JOINED,
 
-    @JsonProperty("conversation.reaction")
+    @SerialName("conversation.reaction")
     REACTION,
 }
