@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-data class Event(
-    val type: EventType,
+data class EventDTO(
+    val type: EventTypeDTO,
     val botId: String,
-    val userId: String,
-    val token: String,
+    val userId: String? = null,
+    val token: String? = null,
     val conversationId: String? = null,
     val text: TextContent? = null,
     val handle: String? = null,

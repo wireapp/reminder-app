@@ -1,6 +1,6 @@
 package com.wire.bots.application
 
-import com.wire.bots.domain.command.CommandProcessor
+import com.wire.bots.domain.event.EventProcessor
 import com.wire.bots.infrastructure.LenientJson
 import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
@@ -23,7 +23,7 @@ class RomanWebsocketClient(
     private val baseUrl: String,
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.bot-key")
     private val botApiKey: String,
-    private val commandProcessor: CommandProcessor
+    private val eventProcessor: EventProcessor
 ) : WebSocket.Listener {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val executorService: ExecutorService = Executors.newFixedThreadPool(5)
@@ -53,10 +53,10 @@ class RomanWebsocketClient(
     override fun onText(webSocket: WebSocket?, data: CharSequence?, last: Boolean): CompletionStage<*> {
         super.onText(webSocket, data, last)
         logger.info(">> Message received raw: $data")
-        val event = LenientJson.parser.decodeFromString<Event>(data.toString())
-        CommandMapper.fromEvent(event).let { command ->
-            logger.info(">> Command received: $command")
-            commandProcessor.process(command)
+        val eventDTO = LenientJson.parser.decodeFromString<EventDTO>(data.toString())
+        EventMapper.fromEvent(eventDTO).let { event ->
+            logger.info(">> Command received: $event")
+            eventProcessor.process(event)
         }
         return CompletableFuture<Void>()
     }

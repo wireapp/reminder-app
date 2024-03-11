@@ -13,5 +13,5 @@ data class Reminder(
     val isEternal: Boolean = false
 )
 
-// reminder@time -> map from command to reminder -> validate command -> schedule reminder
+// reminder@time -> map from event to reminder -> validate event -> schedule reminder
 // scheduler/quartz delegated -> get reminder info (ie, token or reminder from db?) and execute send reminder.
