@@ -1,0 +1,72 @@
+package com.wire.bots
+
+import com.mdimension.jchronic.Chronic
+import com.mdimension.jchronic.Options
+import com.mdimension.jchronic.tags.Pointer
+import io.github.yamilmedina.naturalkron.NaturalKronExpressionParser
+import java.time.Clock
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
+class TimeParsingTest {
+
+    @Test
+    fun givenTomorrowIsGiven_thenTheDateTimeShouldMatchForNowPlusOneDay() {
+        // given
+        val now = Date.from(Instant.now(Clock.systemDefaultZone()))
+        val expected = now.toInstant().plus(1, ChronoUnit.DAYS)
+
+        // when
+        val dateSpan = Chronic.parse("tomorrow", JCHRONIC_OPTS)
+
+        // then
+        with(dateSpan.beginCalendar) {
+            assertEquals(expected.truncatedTo(ChronoUnit.DAYS), toInstant().truncatedTo(ChronoUnit.DAYS))
+        }
+    }
+
+    @Test
+    fun givenOneWeekIsGiven_thenTheDateTimeShouldMatchForNowPlus1Week() {
+        // given
+        val now = Date.from(Instant.now(Clock.systemDefaultZone()))
+        val expected = now.toInstant().plus(7, ChronoUnit.DAYS)
+
+        // when
+        val dateSpan = Chronic.parse("in one week", JCHRONIC_OPTS)
+
+        // then
+        with(dateSpan.beginCalendar) {
+            assertEquals(expected.truncatedTo(ChronoUnit.DAYS), toInstant().truncatedTo(ChronoUnit.DAYS))
+        }
+    }
+
+    @Test
+    fun givenAnSpecificDateIsGiven_thenTheDateTimeShouldMatch() {
+        // given
+        val expected = LocalDateTime.of(2222, 11, 15, 10, 0)
+
+        // when
+        val dateSpan = Chronic.parse("15/11/2222 at 10am", JCHRONIC_OPTS)
+
+        // then
+        with(dateSpan.beginCalendar) {
+            assertEquals(expected, toInstant().atZone(timeZone.toZoneId()).toLocalDateTime())
+        }
+    }
+
+    @Test
+    fun givenARecurringExpression_thenTheResultIsAValidCronExpression() {
+        val parsed = NaturalKronExpressionParser().parse("every monday at 10am")
+        assertEquals(DayOfWeek.MONDAY.value.toString(), parsed.dayOfWeek)
+        assertEquals("0 0 10 * * 1", parsed.toString())
+    }
+
+    companion object {
+        private val JCHRONIC_OPTS = Options(Pointer.PointerType.FUTURE)
+    }
+}

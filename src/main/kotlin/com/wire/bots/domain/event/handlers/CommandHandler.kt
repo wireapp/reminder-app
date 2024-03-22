@@ -14,6 +14,8 @@ class CommandHandler(private val outgoingMessageRepository: OutgoingMessageRepos
 
             is Command.Help ->
                 outgoingMessageRepository.sendMessage(event.conversationId, event.token, createHelpMessage())
+
+            is Command.NewReminder -> outgoingMessageRepository.sendMessage(event.conversationId, event.token, event.reminder.toString())
         }
     }
 
@@ -21,7 +23,7 @@ class CommandHandler(private val outgoingMessageRepository: OutgoingMessageRepos
         fun createLegacyHelpMessage(): String {
             return """
             Hi, I'm the Reminders bot.
-            Please use my specific help event **`/remind.help`** to get more information about how to use me.
+            Please use my specific help event **`/remind help`** to get more information about how to use me.
             """.trimIndent()
         }
 
@@ -32,22 +34,22 @@ class CommandHandler(private val outgoingMessageRepository: OutgoingMessageRepos
         
             1. You can start by creating a reminder with the following event, some valid examples are:
             
-            - **`/remind.new "do something" "in 5 minutes"`**
-            - **`/remind.new "do something" "today at 9am"`**
-            - **`/remind.new "do something" "18/09/2024 at 7pm"`**
-            - **`/remind.new "do something" "next monday at 9am"`**
+            - **`/remind to "do something" "in 5 minutes"`**
+            - **`/remind to "do something" "today at 9am"`**
+            - **`/remind to "do something" "18/09/2024 at 7pm"`**
+            - **`/remind to "do something" "next monday at 9am"`**
             
             You can also create a reminder that repeats, for example:
             
-            - **`/remind.new "do something" "every day at 10am"`**
+            - **`/remind to "Start the daily stand up" "every day at 10am"`**
             
             2. You can list all the active reminders in the conversation with the following event:
             
-            - **`/remind.list`**
+            - **`/remind list`**
             
             3. And you can delete a reminder with the following event:
             
-            - **`/remind.delete <reminderId>`** (you can get the <reminderId> from the list event)
+            - **`/remind delete <reminderId>`** (you can get the <reminderId> from the list event)
             """.trimIndent()
         }
     }

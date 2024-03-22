@@ -13,6 +13,7 @@ CREATE TABLE REMINDERS (
     conversation_id VARCHAR(120),
     task VARCHAR(250),
     scheduled_at TIMESTAMP,
+    scheduled_cron VARCHAR(120),
     is_eternal BOOL DEFAULT FALSE,
     PRIMARY KEY (id)
 );

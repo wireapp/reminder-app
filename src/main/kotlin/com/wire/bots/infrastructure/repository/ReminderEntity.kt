@@ -13,6 +13,7 @@ data class ReminderEntity(
     @Column(name = "conversation_id") val conversationId: String,
     @Column(name = "task_id") val taskId: String,
     @Column(name = "task") val task: String,
-    @Column(name = "scheduled_at") val scheduledAt: Instant,
+    @Column(name = "scheduled_at") val scheduledAt: Instant? = null,
+    @Column(name = "scheduled_cron") val scheduledCron: String? = null,
     @Column(name = "is_eternal") val isEternal: Boolean = false
 ) : PanacheEntity()

@@ -7,25 +7,45 @@ import com.wire.bots.infrastructure.client.OutgoingMessageType
 import com.wire.bots.infrastructure.repository.ReminderEntity
 
 fun Reminder.toEntity(): ReminderEntity {
-    return ReminderEntity(
-        conversationId = this.conversationId,
-        taskId = this.taskId,
-        task = this.task,
-        scheduledAt = this.scheduledAt,
-        createdAt = this.createdAt,
-        isEternal = this.isEternal
-    )
+    return when (this) {
+        is Reminder.RecurringReminder -> ReminderEntity(
+            conversationId = this.conversationId,
+            taskId = this.taskId,
+            task = this.task,
+            createdAt = this.createdAt,
+            scheduledCron = this.scheduledCron,
+            isEternal = true
+        )
+
+        is Reminder.SingleReminder -> ReminderEntity(
+            conversationId = this.conversationId,
+            taskId = this.taskId,
+            task = this.task,
+            scheduledAt = this.scheduledAt,
+            createdAt = this.createdAt,
+            isEternal = false
+        )
+    }
 }
 
 fun ReminderEntity.toDomain(): Reminder {
-    return Reminder(
-        conversationId = this.conversationId,
-        taskId = this.taskId,
-        task = this.task,
-        scheduledAt = this.scheduledAt,
-        createdAt = this.createdAt,
-        isEternal = this.isEternal
-    )
+    return when (isEternal) {
+        true -> return Reminder.RecurringReminder(
+            conversationId = this.conversationId,
+            taskId = this.taskId,
+            task = this.task,
+            scheduledCron = this.scheduledCron!!,
+            createdAt = this.createdAt
+        )
+
+        false -> Reminder.SingleReminder(
+            conversationId = this.conversationId,
+            taskId = this.taskId,
+            task = this.task,
+            scheduledAt = this.scheduledAt!!,
+            createdAt = this.createdAt,
+        )
+    }
 }
 
 fun String.toOutgoingMessage(): OutgoingMessage {

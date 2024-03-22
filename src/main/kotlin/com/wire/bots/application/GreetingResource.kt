@@ -13,10 +13,10 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import java.time.Instant
 import java.util.*
+import org.quartz.CronScheduleBuilder
 import org.quartz.JobBuilder
 import org.quartz.JobKey
 import org.quartz.Scheduler
-import org.quartz.SimpleScheduleBuilder
 import org.quartz.Trigger
 import org.quartz.TriggerBuilder
 import org.quartz.impl.matchers.GroupMatcher
@@ -41,13 +41,12 @@ class GreetingResource {
     fun hello(): Uni<String> {
         // first, persist in db the task (todo, save token)
         val newTaskId = UUID.randomUUID().toString()
-        val reminder = Reminder(
+        val reminder = Reminder.SingleReminder(
             createdAt = Instant.now(),
             conversationId = "ConvoId",
             task = "Join the daily stand-up at 10:00 AM",
             scheduledAt = Instant.now().plusSeconds(3600L),
             taskId = newTaskId,
-            isEternal = false
         )
         reminderRepository.persistReminder(reminder)
 
@@ -60,10 +59,12 @@ class GreetingResource {
             .withIdentity("myTriggerFor_$newTaskId", "ConvoId")
             .startAt(Date.from(Instant.now().plusSeconds(10)))
             .withSchedule(
-                SimpleScheduleBuilder.simpleSchedule()
-                    .withIntervalInSeconds(10)
-                    .withRepeatCount(2)
-//                    .repeatForever()
+                CronScheduleBuilder
+                    .cronSchedule("0/10 * * * * ?")
+//                SimpleScheduleBuilder.simpleSchedule()
+//                    .withIntervalInSeconds(10)
+//                    .withRepeatCount(2)
+////                    .repeatForever()
             )
             .build()
         quartz.scheduleJob(job, trigger)

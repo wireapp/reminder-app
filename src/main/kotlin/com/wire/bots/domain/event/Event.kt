@@ -1,6 +1,7 @@
 package com.wire.bots.domain.event
 
 import com.wire.bots.domain.PlainConversationId
+import com.wire.bots.domain.reminder.Reminder
 
 sealed interface Event {
     val conversationId: PlainConversationId
@@ -24,6 +25,15 @@ sealed class Command(
     data class LegacyHelp(override val conversationId: PlainConversationId, override val token: String) :
         Command(conversationId, token)
 
+    /**
+     * New reminder event, for the target conversation.
+     */
+    data class NewReminder(
+        override val conversationId: PlainConversationId,
+        override val token: String,
+        val reminder: Reminder
+    ) : Command(conversationId, token)
+
 }
 
 sealed class Signal(override val conversationId: PlainConversationId, override val token: String) : Event {
@@ -40,7 +50,9 @@ sealed class Signal(override val conversationId: PlainConversationId, override v
         Signal(conversationId, token)
 }
 
-sealed class Error(override val conversationId: PlainConversationId, override val token: String) : Event {
+sealed class BotError(
+    open val conversationId: PlainConversationId, open val token: String, open val reason: String = "Core error"
+) : Exception() {
 
     /**
      * An event that can be ignored-skipped by the bot
@@ -48,7 +60,7 @@ sealed class Error(override val conversationId: PlainConversationId, override va
      *
      * This event should be logged, but not processed.
      */
-    data object Skip : Error("", "")
+    data object Skip : BotError("", "")
 
     /**
      * Unknown event, or error while parsing the event by the bot.o
@@ -56,6 +68,24 @@ sealed class Error(override val conversationId: PlainConversationId, override va
     data class Unknown(
         override val conversationId: PlainConversationId,
         override val token: String,
-        val reason: String = "Unknown event"
-    ) : Error(conversationId, token)
+        override val reason: String = "Unknown event"
+    ) : BotError(conversationId, token, reason)
+
+    /**
+     * Error while processing the reminder.
+     */
+    data class ReminderError(
+        override val conversationId: PlainConversationId,
+        override val token: String,
+        val errorType: ErrorType
+    ) : BotError(conversationId, token, errorType.message)
+
+    enum class ErrorType(val message: String) {
+        DATE_IN_PAST("❌ Reminder date is in the past. Please provide a date in the future."),
+        INCREMENT_IN_TIMEUNIT("❌ Increment in time units is not allowed, try again with days, weeks or greater."),
+        PARSE_ERROR(
+            "❌ I'm sorry, I didn't catch that. I can get a little confused at times. " +
+                    "Please try again with a different format or see examples with **`/remind help`**."
+        )
+    }
 }

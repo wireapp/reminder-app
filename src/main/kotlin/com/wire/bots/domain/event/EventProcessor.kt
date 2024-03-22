@@ -27,11 +27,23 @@ class EventProcessor(
         when (event) {
             is Command -> commandHandler.onEvent(event)
             is Signal -> signalHandler.onEvent(event)
-            is Error.Unknown -> handleErrorMessage(event)
-            is Error.Skip -> logger.warn("Event skipped, not necessary to handle").right()
+        }.mapLeft { unhandled ->
+            logger.error("Error processing event: $event", unhandled)
+            unhandled
         }
 
-    private fun handleErrorMessage(error: Error.Unknown): Either<Throwable, Unit> {
+    fun process(error: BotError): Either<Throwable, Unit> =
+        when (error) {
+            is BotError.Unknown -> handleErrorMessage(error)
+            is BotError.Skip -> logger.warn("Event skipped, not necessary to handle").right()
+            is BotError.ReminderError -> handleErrorMessage(error)
+        }.mapLeft { unhandled ->
+            logger.error("Fatal! Error while processing error, closing the door from outside", unhandled)
+            unhandled
+        }
+
+
+    private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> {
         return outgoingMessageRepository.sendMessage(
             error.conversationId, error.token, error.reason
         )

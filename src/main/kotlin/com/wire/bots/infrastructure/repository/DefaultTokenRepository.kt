@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.token.TokenRepository
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepository
+import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 
@@ -17,7 +18,8 @@ class DefaultTokenRepository : PanacheRepository<TokenEntity>, TokenRepository {
     }
 
     override fun getToken(conversationId: PlainConversationId): Either<Throwable, String> = either {
-        find("conversationId").singleResult().token
+        find("conversationId", sort = Sort.by("createdAt", Sort.Direction.Descending))
+            .list().first().token
     }
 
     @Transactional

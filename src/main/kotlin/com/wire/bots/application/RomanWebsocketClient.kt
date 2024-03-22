@@ -46,7 +46,7 @@ class RomanWebsocketClient(
     }
 
     override fun onOpen(webSocket: WebSocket?) {
-        logger.info(">> Websocket opened")
+        logger.info("Websocket opened")
         super.onOpen(webSocket)
     }
 
@@ -54,23 +54,28 @@ class RomanWebsocketClient(
         super.onText(webSocket, data, last)
         logger.info(">> Message received raw: $data")
         val eventDTO = LenientJson.parser.decodeFromString<EventDTO>(data.toString())
-        EventMapper.fromEvent(eventDTO).let { event ->
-            logger.info(">> Command received: $event")
-            eventProcessor.process(event)
-        }
+        EventMapper.fromEvent(eventDTO).fold(
+            ifLeft = { error ->
+                logger.warn("Processing command with error: $error")
+                eventProcessor.process(error)
+            }, ifRight = { event ->
+                logger.info("Processing command parsed to: $event")
+                eventProcessor.process(event)
+            }
+        )
         return CompletableFuture<Void>()
     }
 
     override fun onClose(webSocket: WebSocket?, statusCode: Int, reason: String?): CompletionStage<*> {
         super.onClose(webSocket, statusCode, reason)
-        logger.info(">> Websocket close: ${reason ?: "no reason"}, reopening...")
+        logger.info("Websocket close: ${reason ?: "no reason"}, reopening...")
         init()
         return CompletableFuture<Void>().also { it.complete(null) }
     }
 
     override fun onError(webSocket: WebSocket?, error: Throwable?) {
         super.onError(webSocket, error)
-        logger.info(">> Websocket error: ${error?.message}, reopening...")
+        logger.info("Websocket error: ${error?.message}, reopening...")
         init()
     }
 }
