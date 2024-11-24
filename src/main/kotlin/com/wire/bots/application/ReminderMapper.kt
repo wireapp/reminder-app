@@ -2,7 +2,6 @@ package com.wire.bots.application
 
 import arrow.core.Either
 import arrow.core.left
-import arrow.core.raise.either
 import arrow.core.right
 import com.mdimension.jchronic.Chronic
 import com.mdimension.jchronic.Options
@@ -11,7 +10,7 @@ import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.reminder.Reminder
-import io.github.yamilmedina.naturalkron.NaturalKronExpressionParser
+import io.github.yamilmedina.kron.NaturalKronParser
 import java.time.Instant
 import java.util.*
 
@@ -19,35 +18,35 @@ class ReminderMapper {
 
     companion object {
         private val INVALID_TIME_TOKENS = listOf("hour", "minute", "second")
-        private val VALID_RECURRENT_TOKENS = listOf("every", "each", "daily", "weekly", "monthly", "yearly")
+        private val VALID_RECURRENT_TOKENS = listOf("every") // todo: expand later, eg. each, daily, weekly, etc.
         private val JCHRONIC_OPTS = Options(Pointer.PointerType.FUTURE)
+        private val naturalKronParser = NaturalKronParser()
 
         fun parseReminder(
             conversationId: String,
             token: String,
             task: String,
             schedule: String
-        ): Either<BotError, Event> = either {
-            if (VALID_RECURRENT_TOKENS.any { schedule.contains(it) } && INVALID_TIME_TOKENS.any { schedule.contains(it) }) {
-                return BotError.ReminderError(conversationId, token, BotError.ErrorType.INCREMENT_IN_TIMEUNIT).left()
-            }
-
-            if (VALID_RECURRENT_TOKENS.any { schedule.contains(it) }) {
-                return runCatching {
-                    Command.NewReminder(
-                        conversationId, token,
-                        Reminder.RecurringReminder(
-                            conversationId = conversationId,
-                            taskId = UUID.randomUUID().toString(),
-                            task = task,
-                            scheduledCron = NaturalKronExpressionParser().parse(schedule).toString()
-                        )
-                    ).right()
-                }.getOrElse {
-                    BotError.ReminderError(conversationId, token, BotError.ErrorType.PARSE_ERROR).left()
+        ): Either<BotError, Event> {
+            return when {
+                VALID_RECURRENT_TOKENS.any { schedule.contains(it) } && INVALID_TIME_TOKENS.any { schedule.contains(it) } -> {
+                    BotError.ReminderError(conversationId, token, BotError.ErrorType.INCREMENT_IN_TIMEUNIT).left()
                 }
-            }
 
+                VALID_RECURRENT_TOKENS.any { schedule.contains(it) } -> {
+                    parseRecurrentTask(conversationId, token, task, schedule)
+                }
+
+                else -> parseSingleTask(schedule, conversationId, token, task)
+            }
+        }
+
+        private fun parseSingleTask(
+            schedule: String,
+            conversationId: String,
+            token: String,
+            task: String
+        ): Either<BotError.ReminderError, Command.NewReminder> {
             return runCatching {
                 val parsedSchedule = Chronic.parse(schedule, JCHRONIC_OPTS)
                 val parsedDate = parsedSchedule.beginCalendar.toInstant()
@@ -61,6 +60,27 @@ class ReminderMapper {
                         taskId = UUID.randomUUID().toString(),
                         task = task,
                         scheduledAt = parsedDate
+                    )
+                ).right()
+            }.getOrElse {
+                BotError.ReminderError(conversationId, token, BotError.ErrorType.PARSE_ERROR).left()
+            }
+        }
+
+        private fun parseRecurrentTask(
+            conversationId: String,
+            token: String,
+            task: String,
+            schedule: String
+        ): Either<BotError.ReminderError, Command.NewReminder> {
+            return runCatching {
+                Command.NewReminder(
+                    conversationId, token,
+                    Reminder.RecurringReminder(
+                        conversationId = conversationId,
+                        taskId = UUID.randomUUID().toString(),
+                        task = task,
+                        scheduledCron = naturalKronParser.parse(schedule)
                     )
                 ).right()
             }.getOrElse {

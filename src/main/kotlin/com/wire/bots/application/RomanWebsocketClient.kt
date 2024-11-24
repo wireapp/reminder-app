@@ -52,7 +52,7 @@ class RomanWebsocketClient(
 
     override fun onText(webSocket: WebSocket?, data: CharSequence?, last: Boolean): CompletionStage<*> {
         super.onText(webSocket, data, last)
-        logger.info(">> Message received raw: $data")
+        logger.debug("Message received raw: $data")
         val eventDTO = LenientJson.parser.decodeFromString<EventDTO>(data.toString())
         EventMapper.fromEvent(eventDTO).fold(
             ifLeft = { error ->

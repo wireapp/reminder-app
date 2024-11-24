@@ -13,8 +13,8 @@ This is a bot that can create reminders for you and your group, and send you a m
 
 ### `"When"` syntax or setting the time for the reminder:
 
-- By default, any reminders for a day (like “tomorrow” or “next Tuesday”) will be delivered at 9 a.m.
-- If you’d like, you can adjust this by using a specific time, like “tomorrow at 5pm” or “next Tuesday at 4pm”.
+- By default, all reminders should use 24 hrs format, including minutes.
+- If the reminder is recurrent or to happen relative to today, you must add the time in the format `<hh:mm> "21:15"`.
 
 > [!NOTE]  
 > You can set reminders for the entire group, but not for someone else (how rude would that be?).
@@ -23,12 +23,13 @@ This is a bot that can create reminders for you and your group, and send you a m
 
 ### Examples:
 
-|                    | Command      | What                                                | When                  |
-|--------------------|--------------|-----------------------------------------------------|-----------------------|
-| one time reminder  | `/remind to` | `"Remember to fill in your invoices by end of day"` | `"tomorrow"`          |
-| one time reminder  | `/remind to` | `"Reply to HR email"`                               | `"in 10 minutes"`     |
-| one time reminder  | `/remind to` | `"Travel back in time to not develop the bot"`      | `"11/11/2150"`        |
-| recurrent reminder | `/remind to` | `"Join the daily stand-up"`                         | `"every day at 10am"` |
+|                    | Command      | What                                           | When                      |
+|--------------------|--------------|------------------------------------------------|---------------------------|
+| one time reminder  | `/remind to` | `"Fill in your invoices by end of day"`        | `"tomorrow at 17:30"`     |
+| one time reminder  | `/remind to` | `"Reply to HR email"`                          | `"in 10 minutes"`         |
+| one time reminder  | `/remind to` | `"Travel back in time to not develop the bot"` | `"11/11/2150"`            |
+| recurrent reminder | `/remind to` | `"Join the daily stand-up"`                    | `"every day at 10:00"`    |
+| recurrent reminder | `/remind to` | `"Empty the unread emails"`                    | `"every friday at 17:00"` |
 
 > [!TIP]  
 > You can set reminders for yourself. To do so, you can use the commands in a private conversation, a 1:1 with the bot.

@@ -6,6 +6,7 @@ import com.wire.bots.domain.DomainComponent
 import com.wire.bots.domain.event.handlers.CommandHandler
 import com.wire.bots.domain.event.handlers.SignalHandler
 import com.wire.bots.domain.message.OutgoingMessageRepository
+import com.wire.bots.domain.usecase.SaveReminderSchedule
 import org.slf4j.LoggerFactory
 
 /**
@@ -29,8 +30,21 @@ class EventProcessor(
             is Signal -> signalHandler.onEvent(event)
         }.mapLeft { unhandled ->
             logger.error("Error processing event: $event", unhandled)
+            outgoingMessageRepository.sendMessage(
+                conversationId = event.conversationId,
+                token = event.token,
+                messageContent = getErrorMessage(unhandled)
+            )
             unhandled
         }
+
+    private fun getErrorMessage(error: Throwable): String {
+        return if (error is SaveReminderSchedule.MaxReminderJobsReached) {
+            "❌ Maximum numbers of active reminders reached (currently ${error.max}). Please delete some reminders first."
+        } else {
+            "An error occurred while processing the event, please try again later."
+        }
+    }
 
     fun process(error: BotError): Either<Throwable, Unit> =
         when (error) {
@@ -41,7 +55,6 @@ class EventProcessor(
             logger.error("Fatal! Error while processing error, closing the door from outside", unhandled)
             unhandled
         }
-
 
     private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> {
         return outgoingMessageRepository.sendMessage(

@@ -3,9 +3,8 @@ package com.wire.bots
 import com.mdimension.jchronic.Chronic
 import com.mdimension.jchronic.Options
 import com.mdimension.jchronic.tags.Pointer
-import io.github.yamilmedina.naturalkron.NaturalKronExpressionParser
+import io.github.yamilmedina.kron.NaturalKronParser
 import java.time.Clock
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -61,9 +60,8 @@ class TimeParsingTest {
 
     @Test
     fun givenARecurringExpression_thenTheResultIsAValidCronExpression() {
-        val parsed = NaturalKronExpressionParser().parse("every monday at 10am")
-        assertEquals(DayOfWeek.MONDAY.value.toString(), parsed.dayOfWeek)
-        assertEquals("0 0 10 * * 1", parsed.toString())
+        val parsed = NaturalKronParser().parse("every monday at 10:00")
+        assertEquals("0 0 10 ? * MON", parsed)
     }
 
     companion object {

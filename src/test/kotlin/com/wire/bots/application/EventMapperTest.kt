@@ -118,7 +118,7 @@ class EventMapperTest {
             conversationId = "conversationId",
             botId = "botId",
             token = "token",
-            text = TextContent("""/remind to "join the refinement session" "tomorrow at 11am"""".trimIndent())
+            text = TextContent("""/remind to "join the refinement session" "tomorrow at 11:00"""".trimIndent())
         )
 
         // when
@@ -141,7 +141,7 @@ class EventMapperTest {
             conversationId = "conversationId",
             botId = "botId",
             token = "token",
-            text = TextContent("""/remind to "join the daily stand up" "every monday at 10am"""".trimIndent())
+            text = TextContent("""/remind to "join the daily stand up" "every monday at 10:00"""".trimIndent())
         )
 
         // when

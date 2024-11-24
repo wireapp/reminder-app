@@ -14,26 +14,34 @@ object EventMapper {
      * Maps the [EventDTO] to an [Event] either [Command] object or [Signal], so it can be processed by the application.
      */
     fun fromEvent(eventDTO: EventDTO): Either<BotError, Event> {
-        return when (eventDTO.type) {
-            EventTypeDTO.NEW_TEXT -> {
-                parseCommand(
+        return runCatching {
+            when (eventDTO.type) {
+                EventTypeDTO.NEW_TEXT -> {
+                    parseCommand(
+                        conversationId = eventDTO.conversationId.orEmpty(),
+                        token = eventDTO.token!!,
+                        rawCommand = eventDTO.text?.data.orEmpty()
+                    )
+                }
+
+                EventTypeDTO.BOT_REMOVED -> Signal.BotRemoved(
                     conversationId = eventDTO.conversationId.orEmpty(),
-                    token = eventDTO.token!!,
-                    rawCommand = eventDTO.text?.data.orEmpty()
-                )
+                    token = eventDTO.token.orEmpty()
+                ).right()
+
+                EventTypeDTO.BOT_REQUEST -> Signal.BotAdded(
+                    conversationId = eventDTO.conversationId.orEmpty(),
+                    token = eventDTO.token!!
+                ).right()
+
+                else -> BotError.Skip.left()
             }
-
-            EventTypeDTO.BOT_REMOVED -> Signal.BotRemoved(
-                conversationId = eventDTO.conversationId.orEmpty(),
-                token = eventDTO.token.orEmpty()
-            ).right()
-
-            EventTypeDTO.BOT_REQUEST -> Signal.BotAdded(
-                conversationId = eventDTO.conversationId.orEmpty(),
-                token = eventDTO.token!!
-            ).right()
-
-            else -> BotError.Skip.left()
+        }.getOrElse {
+            BotError.ReminderError(
+                eventDTO.conversationId.orEmpty(),
+                eventDTO.token.orEmpty(),
+                errorType = BotError.ErrorType.PARSE_ERROR
+            ).left()
         }
     }
 

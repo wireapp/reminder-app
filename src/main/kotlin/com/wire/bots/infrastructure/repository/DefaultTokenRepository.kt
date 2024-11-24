@@ -18,7 +18,7 @@ class DefaultTokenRepository : PanacheRepository<TokenEntity>, TokenRepository {
     }
 
     override fun getToken(conversationId: PlainConversationId): Either<Throwable, String> = either {
-        find("conversationId", sort = Sort.by("createdAt", Sort.Direction.Descending))
+        find("conversationId", sort = Sort.by("createdAt", Sort.Direction.Descending), conversationId)
             .list().first().token
     }
 
