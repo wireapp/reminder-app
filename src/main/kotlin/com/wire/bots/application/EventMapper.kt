@@ -76,7 +76,7 @@ object EventMapper {
             }
 
             args.trim() == "list" -> {
-                BotError.Unknown(conversationId, token, "Not implemented").left()
+                Command.ListReminders(conversationId, token).right()
             }
 
             args.startsWith("to") -> {

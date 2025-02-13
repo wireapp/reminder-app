@@ -19,7 +19,6 @@ class ReminderMapper {
     companion object {
         private val INVALID_TIME_TOKENS = listOf("hour", "minute", "second")
         private val VALID_RECURRENT_TOKENS = listOf("every") // todo: expand later, eg. each, daily, weekly, etc.
-        private val JCHRONIC_OPTS = Options(Pointer.PointerType.FUTURE)
         private val naturalKronParser = NaturalKronParser()
 
         fun parseReminder(
@@ -48,7 +47,7 @@ class ReminderMapper {
             task: String
         ): Either<BotError.ReminderError, Command.NewReminder> {
             return runCatching {
-                val parsedSchedule = Chronic.parse(schedule, JCHRONIC_OPTS)
+                val parsedSchedule = Chronic.parse(schedule, Options(Pointer.PointerType.FUTURE))
                 val parsedDate = parsedSchedule.beginCalendar.toInstant()
                 if (parsedDate.isBefore(Instant.now())) {
                     return BotError.ReminderError(conversationId, token, BotError.ErrorType.DATE_IN_PAST).left()

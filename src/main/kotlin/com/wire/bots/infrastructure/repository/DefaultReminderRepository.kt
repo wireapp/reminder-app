@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.domain.reminder.ReminderRepository
+import com.wire.bots.infrastructure.toDomain
 import com.wire.bots.infrastructure.toEntity
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepository
 import jakarta.enterprise.context.ApplicationScoped
@@ -20,6 +21,12 @@ class DefaultReminderRepository : PanacheRepository<ReminderEntity>, ReminderRep
     @Transactional
     override fun countRemindersByConversationId(conversationId: PlainConversationId): Long =
         count("conversationId", conversationId)
+
+    @Transactional
+    override fun getReminderOnConversationId(conversationId: PlainConversationId): Either<Throwable, List<Reminder>> =
+        Either.catch {
+            list("conversationId", conversationId).map { it.toDomain() }
+        }
 
 }
 

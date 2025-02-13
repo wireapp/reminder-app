@@ -7,12 +7,14 @@ import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.domain.reminder.ReminderNextSchedule
+import com.wire.bots.domain.usecase.ListRemindersInConversation
 import com.wire.bots.domain.usecase.SaveReminderSchedule
 
 @DomainComponent
 class CommandHandler(
     private val outgoingMessageRepository: OutgoingMessageRepository,
     private val saveReminderSchedule: SaveReminderSchedule,
+    private val listRemindersInConversation: ListRemindersInConversation
 ) : EventHandler<Command> {
     override fun onEvent(event: Command): Either<Throwable, Unit> {
         return when (event) {
@@ -23,6 +25,22 @@ class CommandHandler(
                 outgoingMessageRepository.sendMessage(event.conversationId, event.token, createHelpMessage())
 
             is Command.NewReminder -> handleNewReminder(event)
+            is Command.ListReminders -> getReminderListMessage(event)
+        }
+    }
+
+    private fun getReminderListMessage(command: Command.ListReminders): Either<Throwable, Unit> {
+        return listRemindersInConversation(command.conversationId).flatMap { reminders ->
+            val message = if (reminders.isEmpty()) {
+                "There are no reminders yet in this conversation."
+            } else {
+                "The reminders in this conversation:\n" +
+                        reminders.joinToString("\n") {
+                            "- What? ${it.task} (**${it.taskId}**)"
+                        }
+            }
+
+            outgoingMessageRepository.sendMessage(command.conversationId, command.token, message)
         }
     }
 

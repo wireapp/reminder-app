@@ -34,6 +34,14 @@ sealed class Command(
         val reminder: Reminder
     ) : Command(conversationId, token)
 
+    /**
+     * List reminders event, for the target conversation.
+     */
+    data class ListReminders(
+        override val conversationId: PlainConversationId,
+        override val token: String,
+    ) : Command(conversationId, token)
+
 }
 
 sealed class Signal(override val conversationId: PlainConversationId, override val token: String) : Event {
