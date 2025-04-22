@@ -16,7 +16,6 @@ import org.quartz.SimpleScheduleBuilder
 import org.quartz.Trigger
 import org.quartz.TriggerBuilder
 
-
 @ApplicationScoped
 class DefaultReminderJobRepository(private val quartz: Scheduler) : ReminderJobRepository {
 
@@ -77,7 +76,6 @@ class DefaultReminderJobRepository(private val quartz: Scheduler) : ReminderJobR
             }
         }
     }
-
 
     /**
      * Get the next fire time for the trigger.

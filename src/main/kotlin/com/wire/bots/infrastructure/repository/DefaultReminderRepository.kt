@@ -27,6 +27,4 @@ class DefaultReminderRepository : PanacheRepository<ReminderEntity>, ReminderRep
         Either.catch {
             list("conversationId", conversationId).map { it.toDomain() }
         }
-
 }
-

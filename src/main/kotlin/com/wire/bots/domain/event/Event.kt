@@ -41,7 +41,6 @@ sealed class Command(
         override val conversationId: PlainConversationId,
         override val token: String,
     ) : Command(conversationId, token)
-
 }
 
 sealed class Signal(override val conversationId: PlainConversationId, override val token: String) : Event {
@@ -59,7 +58,9 @@ sealed class Signal(override val conversationId: PlainConversationId, override v
 }
 
 sealed class BotError(
-    open val conversationId: PlainConversationId, open val token: String, open val reason: String = "Core error"
+    open val conversationId: PlainConversationId,
+    open val token: String,
+    open val reason: String = "Core error"
 ) : Exception() {
 
     /**
@@ -93,7 +94,7 @@ sealed class BotError(
         INCREMENT_IN_TIMEUNIT("❌ Increment in time units is not allowed, try again with days, weeks or greater."),
         PARSE_ERROR(
             "❌ I'm sorry, I didn't catch that. I can get a little confused at times. " +
-                    "Please try again with a different format or see examples with **`/remind help`**."
+                "Please try again with a different format or see examples with **`/remind help`**."
         )
     }
 }

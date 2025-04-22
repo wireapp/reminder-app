@@ -18,6 +18,4 @@ class ReminderJob(@Inject val reminderTaskExecutor: ReminderTaskExecutor) : Job 
         taskId.let { logger.info("Executing task? : $it") }
         taskId?.let { reminderTaskExecutor.doWork(it) }
     }
-
 }
-

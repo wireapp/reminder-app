@@ -18,5 +18,4 @@ class SignalHandler(
             is Signal.BotRemoved -> deleteConversationToken(event.conversationId)
         }
     }
-
 }

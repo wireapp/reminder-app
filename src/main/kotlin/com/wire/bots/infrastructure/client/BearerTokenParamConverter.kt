@@ -21,17 +21,16 @@ class BearerTokenParamConverter : ParamConverter<BearerToken> {
     override fun fromString(value: BearerToken?): BearerToken {
         return "Bearer $value"
     }
-
 }
 
 @Provider
 class BearerTokenParamConverterProvider : ParamConverterProvider {
     override fun <T> getConverter(
-        rawType: Class<T>, genericType: Type?,
+        rawType: Class<T>,
+        genericType: Type?,
         annotations: Array<Annotation?>?
     ): ParamConverter<T>? {
         if (rawType == String::class.java) return BearerTokenParamConverter() as (ParamConverter<T>)
         return null
     }
 }
-

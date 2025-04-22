@@ -43,5 +43,4 @@ class SaveReminderSchedule(
     companion object {
         private const val MAX_REMINDER_JOBS = 3
     }
-
 }

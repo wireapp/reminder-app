@@ -57,7 +57,8 @@ object EventMapper {
         return when (words[0]) {
             "/help" -> Command.LegacyHelp(conversationId, token).right()
             "/remind" -> parseCommandArgs(
-                conversationId, token,
+                conversationId,
+                token,
                 rawCommand.substringAfter("/remind").trimStart()
             )
 
@@ -112,4 +113,5 @@ Unknown command, valid options are:
 > /remind list
 > /remind to "what" "when"
 > /remind delete <reminderId>
-```""".trimIndent()
+```
+""".trimIndent()

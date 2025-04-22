@@ -28,8 +28,14 @@ class ReminderMapper {
             schedule: String
         ): Either<BotError, Event> {
             return when {
-                VALID_RECURRENT_TOKENS.any { schedule.contains(it) } && INVALID_TIME_TOKENS.any { schedule.contains(it) } -> {
-                    BotError.ReminderError(conversationId, token, BotError.ErrorType.INCREMENT_IN_TIMEUNIT).left()
+                VALID_RECURRENT_TOKENS.any { schedule.contains(it) } && INVALID_TIME_TOKENS.any {
+                    schedule.contains(it)
+                } -> {
+                    BotError.ReminderError(
+                        conversationId,
+                        token,
+                        BotError.ErrorType.INCREMENT_IN_TIMEUNIT
+                    ).left()
                 }
 
                 VALID_RECURRENT_TOKENS.any { schedule.contains(it) } -> {
@@ -53,7 +59,8 @@ class ReminderMapper {
                     return BotError.ReminderError(conversationId, token, BotError.ErrorType.DATE_IN_PAST).left()
                 }
                 Command.NewReminder(
-                    conversationId, token,
+                    conversationId,
+                    token,
                     Reminder.SingleReminder(
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
@@ -74,7 +81,8 @@ class ReminderMapper {
         ): Either<BotError.ReminderError, Command.NewReminder> {
             return runCatching {
                 Command.NewReminder(
-                    conversationId, token,
+                    conversationId,
+                    token,
                     Reminder.RecurringReminder(
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
@@ -87,5 +95,4 @@ class ReminderMapper {
             }
         }
     }
-
 }

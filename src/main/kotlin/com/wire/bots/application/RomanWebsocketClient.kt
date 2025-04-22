@@ -58,7 +58,8 @@ class RomanWebsocketClient(
             ifLeft = { error ->
                 logger.warn("Processing command with error: $error")
                 eventProcessor.process(error)
-            }, ifRight = { event ->
+            },
+            ifRight = { event ->
                 logger.info("Processing command parsed to: $event")
                 eventProcessor.process(event)
             }
@@ -79,4 +80,3 @@ class RomanWebsocketClient(
         init()
     }
 }
-

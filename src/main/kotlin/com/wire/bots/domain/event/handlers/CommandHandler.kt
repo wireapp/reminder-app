@@ -34,10 +34,9 @@ class CommandHandler(
             val message = if (reminders.isEmpty()) {
                 "There are no reminders yet in this conversation."
             } else {
-                "The reminders in this conversation:\n" +
-                        reminders.joinToString("\n") {
-                            "- What? ${it.task} (**${it.taskId}**)"
-                        }
+                "The reminders in this conversation:\n" + reminders.joinToString("\n") {
+                    "- What? ${it.task} (**${it.taskId}**)"
+                }
             }
 
             outgoingMessageRepository.sendMessage(command.conversationId, command.token, message)
@@ -54,16 +53,16 @@ class CommandHandler(
         return when (val reminder = reminderNextSchedule.reminder) {
             is Reminder.SingleReminder -> {
                 "I will remind you to '${reminder.task}' at ${reminderNextSchedule.nextSchedules.first()}.\n" +
-                        "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`"
+                    "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`"
             }
 
             is Reminder.RecurringReminder -> {
                 "I will periodically remind you to '${reminder.task}'.\n" +
-                        "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`\n\n" +
-                        "The next ${reminderNextSchedule.nextSchedules.size} schedules for the reminder is:\n" +
-                        reminderNextSchedule.nextSchedules.joinToString("\n") {
-                            "- $it"
-                        }
+                    "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`\n\n" +
+                    "The next ${reminderNextSchedule.nextSchedules.size} schedules for the reminder is:\n" +
+                    reminderNextSchedule.nextSchedules.joinToString("\n") {
+                        "- $it"
+                    }
             }
         }
     }
