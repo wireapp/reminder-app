@@ -96,7 +96,7 @@ object EventMapper {
 
             args.startsWith("delete") -> {
                 // todo, validate the reminderId
-                val arg = args.substringAfter("delete").trim()
+                // val arg = args.substringAfter("delete").trim()
                 BotError.Unknown(conversationId, token, "Not implemented").left()
             }
 
