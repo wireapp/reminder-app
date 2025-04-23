@@ -115,11 +115,11 @@ object EventMapper {
 internal val COMMAND_EXPRESSION: Regex = "\\s+".toRegex()
 internal val COMMAND_HINT =
     """
-Unknown command, valid options are:
-```
-> /remind help
-> /remind list
-> /remind to "what" "when"
-> /remind delete <reminderId>
-```
+    Unknown command, valid options are:
+    ```
+    > /remind help
+    > /remind list
+    > /remind to "what" "when"
+    > /remind delete <reminderId>
+    ```
     """.trimIndent()

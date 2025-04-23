@@ -52,6 +52,6 @@ fun ReminderEntity.toDomain(): Reminder {
 
 fun String.toOutgoingMessage(): OutgoingMessage =
     OutgoingMessage(
-        type = OutgoingMessageType.text,
+        type = OutgoingMessageType.Text,
         text = MessagePayload.Text(this),
     )

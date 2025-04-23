@@ -16,5 +16,5 @@ sealed interface MessagePayload {
 }
 
 enum class OutgoingMessageType {
-    text,
+    Text,
 }

@@ -39,7 +39,8 @@ class EventProcessor(
 
     private fun getErrorMessage(error: Throwable): String =
         if (error is SaveReminderSchedule.MaxReminderJobsReached) {
-            "❌ Maximum numbers of active reminders reached (currently ${error.max}). Please delete some reminders first."
+            "❌ Maximum numbers of active reminders reached (currently ${error.max})." +
+                "Please delete some reminders first."
         } else {
             "An error occurred while processing the event, please try again later."
         }
