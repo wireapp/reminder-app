@@ -6,7 +6,6 @@ import java.time.Instant
 import java.util.*
 
 sealed interface Reminder {
-
     val createdAt: Instant
     val conversationId: PlainConversationId
     val taskId: TaskId
@@ -25,11 +24,11 @@ sealed interface Reminder {
         override val conversationId: PlainConversationId,
         override val taskId: TaskId,
         override val task: String,
-        val scheduledCron: String
+        val scheduledCron: String,
     ) : Reminder
 }
 
 class ReminderNextSchedule(
     val reminder: Reminder,
-    val nextSchedules: List<Date>
+    val nextSchedules: List<Date>,
 )

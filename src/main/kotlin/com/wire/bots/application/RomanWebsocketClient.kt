@@ -5,6 +5,8 @@ import com.wire.bots.infrastructure.LenientJson
 import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
+import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -13,8 +15,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import org.eclipse.microprofile.config.inject.ConfigProperty
-import org.slf4j.LoggerFactory
 
 @ApplicationScoped
 @Startup
@@ -23,24 +23,28 @@ class RomanWebsocketClient(
     private val baseUrl: String,
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.bot-key")
     private val botApiKey: String,
-    private val eventProcessor: EventProcessor
+    private val eventProcessor: EventProcessor,
 ) : WebSocket.Listener {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val executorService: ExecutorService = Executors.newFixedThreadPool(5)
 
-    private val httpClient: HttpClient = HttpClient.newBuilder()
-        .followRedirects(HttpClient.Redirect.ALWAYS)
-        .executor(executorService)
-        .build()
+    private val httpClient: HttpClient =
+        HttpClient
+            .newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .executor(executorService)
+            .build()
 
-    private val wsUri = run {
-        URI(baseUrl.replace("https://", "wss://"))
-            .resolve("/await/" + URLEncoder.encode(botApiKey, "utf-8"))
-    }
+    private val wsUri =
+        run {
+            URI(baseUrl.replace("https://", "wss://"))
+                .resolve("/await/" + URLEncoder.encode(botApiKey, "utf-8"))
+        }
 
     @PostConstruct
     fun init() {
-        httpClient.newWebSocketBuilder()
+        httpClient
+            .newWebSocketBuilder()
             .buildAsync(wsUri, this)
             .join()
     }
@@ -50,7 +54,11 @@ class RomanWebsocketClient(
         super.onOpen(webSocket)
     }
 
-    override fun onText(webSocket: WebSocket?, data: CharSequence?, last: Boolean): CompletionStage<*> {
+    override fun onText(
+        webSocket: WebSocket?,
+        data: CharSequence?,
+        last: Boolean,
+    ): CompletionStage<*> {
         super.onText(webSocket, data, last)
         logger.debug("Message received raw: $data")
         val eventDTO = LenientJson.parser.decodeFromString<EventDTO>(data.toString())
@@ -58,25 +66,32 @@ class RomanWebsocketClient(
             ifLeft = { error ->
                 logger.warn("Processing command with error: $error")
                 eventProcessor.process(error)
-            }, ifRight = { event ->
+            },
+            ifRight = { event ->
                 logger.info("Processing command parsed to: $event")
                 eventProcessor.process(event)
-            }
+            },
         )
         return CompletableFuture<Void>()
     }
 
-    override fun onClose(webSocket: WebSocket?, statusCode: Int, reason: String?): CompletionStage<*> {
+    override fun onClose(
+        webSocket: WebSocket?,
+        statusCode: Int,
+        reason: String?,
+    ): CompletionStage<*> {
         super.onClose(webSocket, statusCode, reason)
         logger.info("Websocket close: ${reason ?: "no reason"}, reopening...")
         init()
         return CompletableFuture<Void>().also { it.complete(null) }
     }
 
-    override fun onError(webSocket: WebSocket?, error: Throwable?) {
+    override fun onError(
+        webSocket: WebSocket?,
+        error: Throwable?,
+    ) {
         super.onError(webSocket, error)
         logger.info("Websocket error: ${error?.message}, reopening...")
         init()
     }
 }
-

@@ -19,9 +19,8 @@ import org.slf4j.LoggerFactory
 class EventProcessor(
     val commandHandler: CommandHandler,
     val signalHandler: SignalHandler,
-    val outgoingMessageRepository: OutgoingMessageRepository
+    val outgoingMessageRepository: OutgoingMessageRepository,
 ) {
-
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun process(event: Event): Either<Throwable, Unit> =
@@ -33,18 +32,17 @@ class EventProcessor(
             outgoingMessageRepository.sendMessage(
                 conversationId = event.conversationId,
                 token = event.token,
-                messageContent = getErrorMessage(unhandled)
+                messageContent = getErrorMessage(unhandled),
             )
             unhandled
         }
 
-    private fun getErrorMessage(error: Throwable): String {
-        return if (error is SaveReminderSchedule.MaxReminderJobsReached) {
+    private fun getErrorMessage(error: Throwable): String =
+        if (error is SaveReminderSchedule.MaxReminderJobsReached) {
             "❌ Maximum numbers of active reminders reached (currently ${error.max}). Please delete some reminders first."
         } else {
             "An error occurred while processing the event, please try again later."
         }
-    }
 
     fun process(error: BotError): Either<Throwable, Unit> =
         when (error) {
@@ -56,9 +54,10 @@ class EventProcessor(
             unhandled
         }
 
-    private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> {
-        return outgoingMessageRepository.sendMessage(
-            error.conversationId, error.token, error.reason
+    private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> =
+        outgoingMessageRepository.sendMessage(
+            error.conversationId,
+            error.token,
+            error.reason,
         )
-    }
 }

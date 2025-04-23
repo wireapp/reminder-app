@@ -2,7 +2,6 @@ package com.wire.bots.application
 
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.shouldFail
-import com.wire.bots.shouldSucceed
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test

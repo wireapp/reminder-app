@@ -6,8 +6,9 @@ import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
 import org.slf4j.LoggerFactory
 
-class ReminderJob(@Inject val reminderTaskExecutor: ReminderTaskExecutor) : Job {
-
+class ReminderJob(
+    @Inject val reminderTaskExecutor: ReminderTaskExecutor,
+) : Job {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Throws(JobExecutionException::class)
@@ -18,6 +19,4 @@ class ReminderJob(@Inject val reminderTaskExecutor: ReminderTaskExecutor) : Job 
         taskId.let { logger.info("Executing task? : $it") }
         taskId?.let { reminderTaskExecutor.doWork(it) }
     }
-
 }
-

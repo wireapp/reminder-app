@@ -13,25 +13,20 @@ typealias BearerToken = String
  *
  */
 class BearerTokenParamConverter : ParamConverter<BearerToken> {
+    override fun toString(value: BearerToken?): BearerToken = "Bearer $value"
 
-    override fun toString(value: BearerToken?): BearerToken {
-        return "Bearer $value"
-    }
-
-    override fun fromString(value: BearerToken?): BearerToken {
-        return "Bearer $value"
-    }
-
+    override fun fromString(value: BearerToken?): BearerToken = "Bearer $value"
 }
 
 @Provider
 class BearerTokenParamConverterProvider : ParamConverterProvider {
     override fun <T> getConverter(
-        rawType: Class<T>, genericType: Type?,
-        annotations: Array<Annotation?>?
+        rawType: Class<T>,
+        genericType: Type?,
+        annotations: Array<Annotation?>?,
     ): ParamConverter<T>? {
-        if (rawType == String::class.java) return BearerTokenParamConverter() as (ParamConverter<T>)
+        if (rawType == String::class.java && genericType?.typeName == BearerToken::class.qualifiedName)
+            return BearerTokenParamConverter() as ParamConverter<T>
         return null
     }
 }
-

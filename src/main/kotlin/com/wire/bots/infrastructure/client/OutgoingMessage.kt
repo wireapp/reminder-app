@@ -11,10 +11,10 @@ data class OutgoingMessage(
 sealed interface MessagePayload {
     @Serializable
     data class Text(
-        val data: String
+        val data: String,
     ) : MessagePayload
 }
 
 enum class OutgoingMessageType {
-    text
+    text,
 }

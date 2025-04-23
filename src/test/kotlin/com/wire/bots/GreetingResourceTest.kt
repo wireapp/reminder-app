@@ -1,12 +1,6 @@
 package com.wire.bots
 
-import io.quarkus.test.junit.QuarkusTest
-import io.restassured.RestAssured.given
-import org.hamcrest.CoreMatchers.`is`
-import org.junit.jupiter.api.Test
-
 class GreetingResourceTest {
-
     fun testHelloEndpoint() {
 //        given()
 //            .`when`().get("/hello")
@@ -14,5 +8,4 @@ class GreetingResourceTest {
 //            .statusCode(200)
 //            .body(`is`("Hello RESTEasy"))
     }
-
 }
