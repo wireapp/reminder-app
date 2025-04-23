@@ -38,7 +38,7 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
 }
 
 group = "com.wire.bots"
