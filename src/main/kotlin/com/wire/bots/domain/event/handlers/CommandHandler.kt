@@ -14,10 +14,10 @@ import com.wire.bots.domain.usecase.SaveReminderSchedule
 class CommandHandler(
     private val outgoingMessageRepository: OutgoingMessageRepository,
     private val saveReminderSchedule: SaveReminderSchedule,
-    private val listRemindersInConversation: ListRemindersInConversation
+    private val listRemindersInConversation: ListRemindersInConversation,
 ) : EventHandler<Command> {
-    override fun onEvent(event: Command): Either<Throwable, Unit> {
-        return when (event) {
+    override fun onEvent(event: Command): Either<Throwable, Unit> =
+        when (event) {
             is Command.LegacyHelp ->
                 outgoingMessageRepository.sendMessage(event.conversationId, event.token, createLegacyHelpMessage())
 
@@ -27,30 +27,29 @@ class CommandHandler(
             is Command.NewReminder -> handleNewReminder(event)
             is Command.ListReminders -> getReminderListMessage(event)
         }
-    }
 
-    private fun getReminderListMessage(command: Command.ListReminders): Either<Throwable, Unit> {
-        return listRemindersInConversation(command.conversationId).flatMap { reminders ->
-            val message = if (reminders.isEmpty()) {
-                "There are no reminders yet in this conversation."
-            } else {
-                "The reminders in this conversation:\n" + reminders.joinToString("\n") {
-                    "- What? ${it.task} (**${it.taskId}**)"
+    private fun getReminderListMessage(command: Command.ListReminders): Either<Throwable, Unit> =
+        listRemindersInConversation(command.conversationId).flatMap { reminders ->
+            val message =
+                if (reminders.isEmpty()) {
+                    "There are no reminders yet in this conversation."
+                } else {
+                    "The reminders in this conversation:\n" +
+                        reminders.joinToString("\n") {
+                            "- What? ${it.task} (**${it.taskId}**)"
+                        }
                 }
-            }
 
             outgoingMessageRepository.sendMessage(command.conversationId, command.token, message)
         }
-    }
 
-    private fun handleNewReminder(command: Command.NewReminder): Either<Throwable, Unit> {
-        return saveReminderSchedule(command.reminder).flatMap {
+    private fun handleNewReminder(command: Command.NewReminder): Either<Throwable, Unit> =
+        saveReminderSchedule(command.reminder).flatMap {
             outgoingMessageRepository.sendMessage(command.conversationId, command.token, getCreatedMessage(it))
         }
-    }
 
-    private fun getCreatedMessage(reminderNextSchedule: ReminderNextSchedule): String {
-        return when (val reminder = reminderNextSchedule.reminder) {
+    private fun getCreatedMessage(reminderNextSchedule: ReminderNextSchedule): String =
+        when (val reminder = reminderNextSchedule.reminder) {
             is Reminder.SingleReminder -> {
                 "I will remind you to '${reminder.task}' at ${reminderNextSchedule.nextSchedules.first()}.\n" +
                     "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`"
@@ -65,21 +64,19 @@ class CommandHandler(
                     }
             }
         }
-    }
 
     companion object {
-        fun createLegacyHelpMessage(): String {
-            return """
+        fun createLegacyHelpMessage(): String =
+            """
             Hi, I'm the Reminders bot.
             Please use my specific help event **`/remind help`** to get more information about how to use me.
             """.trimIndent()
-        }
 
-        fun createHelpMessage(): String {
-            return """
+        fun createHelpMessage(): String =
+            """
             Hi, I'm the Reminders bot.
             I can help you to create reminders for your conversations, or yourself.
-        
+            
             1. You can start by creating a reminder with the following event, some valid examples are:
             
             - **`/remind to "do something" "in 5 minutes"`**
@@ -99,6 +96,5 @@ class CommandHandler(
             
             - **`/remind delete <reminderId>`** (you can get the <reminderId> from the list event)
             """.trimIndent()
-        }
     }
 }

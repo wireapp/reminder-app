@@ -10,20 +10,29 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 
 @ApplicationScoped
-class DefaultTokenRepository : PanacheRepository<TokenEntity>, TokenRepository {
+class DefaultTokenRepository :
+    PanacheRepository<TokenEntity>,
+    TokenRepository {
+    @Transactional
+    override fun insertToken(
+        conversationId: PlainConversationId,
+        newToken: String,
+    ): Either<Throwable, Unit> =
+        either {
+            persist(TokenEntity(conversationId, newToken))
+        }
+
+    override fun getToken(conversationId: PlainConversationId): Either<Throwable, String> =
+        either {
+            find("conversationId", sort = Sort.by("createdAt", Sort.Direction.Descending), conversationId)
+                .list()
+                .first()
+                .token
+        }
 
     @Transactional
-    override fun insertToken(conversationId: PlainConversationId, newToken: String): Either<Throwable, Unit> = either {
-        persist(TokenEntity(conversationId, newToken))
-    }
-
-    override fun getToken(conversationId: PlainConversationId): Either<Throwable, String> = either {
-        find("conversationId", sort = Sort.by("createdAt", Sort.Direction.Descending), conversationId)
-            .list().first().token
-    }
-
-    @Transactional
-    override fun deleteToken(conversationId: PlainConversationId): Either<Throwable, Unit> = either {
-        delete("conversationId", conversationId)
-    }
+    override fun deleteToken(conversationId: PlainConversationId): Either<Throwable, Unit> =
+        either {
+            delete("conversationId", conversationId)
+        }
 }

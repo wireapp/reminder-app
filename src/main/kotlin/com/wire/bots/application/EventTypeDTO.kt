@@ -3,7 +3,6 @@ package com.wire.bots.application
 import kotlinx.serialization.SerialName
 
 enum class EventTypeDTO {
-
     @SerialName("conversation.bot_request")
     BOT_REQUEST,
 

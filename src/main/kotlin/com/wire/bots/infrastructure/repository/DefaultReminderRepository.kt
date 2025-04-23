@@ -11,16 +11,17 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 
 @ApplicationScoped
-class DefaultReminderRepository : PanacheRepository<ReminderEntity>, ReminderRepository {
+class DefaultReminderRepository :
+    PanacheRepository<ReminderEntity>,
+    ReminderRepository {
+    @Transactional
+    override fun persistReminder(reminder: Reminder): Either<Throwable, Unit> =
+        Either.catch {
+            persist(reminder.toEntity())
+        }
 
     @Transactional
-    override fun persistReminder(reminder: Reminder): Either<Throwable, Unit> = Either.catch {
-        persist(reminder.toEntity())
-    }
-
-    @Transactional
-    override fun countRemindersByConversationId(conversationId: PlainConversationId): Long =
-        count("conversationId", conversationId)
+    override fun countRemindersByConversationId(conversationId: PlainConversationId): Long = count("conversationId", conversationId)
 
     @Transactional
     override fun getReminderOnConversationId(conversationId: PlainConversationId): Either<Throwable, List<Reminder>> =

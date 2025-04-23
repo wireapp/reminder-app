@@ -12,15 +12,16 @@ import org.slf4j.LoggerFactory
 
 @ApplicationScoped
 class DefaultOutgoingMessageRepository(
-    @RestClient val conversationRemoteApi: ConversationRemoteApi
+    @RestClient val conversationRemoteApi: ConversationRemoteApi,
 ) : OutgoingMessageRepository {
-    private val logger = LoggerFactory.getLogger(this::class.java)
+    // private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun sendMessage(
         conversationId: PlainConversationId,
         token: String,
-        messageContent: String
-    ): Either<Throwable, Unit> = either {
-        conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
-    }
+        messageContent: String,
+    ): Either<Throwable, Unit> =
+        either {
+            conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
+        }
 }
