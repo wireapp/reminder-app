@@ -26,7 +26,12 @@ class RomanWebsocketClient(
     private val eventProcessor: EventProcessor,
 ) : WebSocket.Listener {
     private val logger = LoggerFactory.getLogger(this::class.java)
-    private val executorService: ExecutorService = Executors.newFixedThreadPool(5)
+
+    private companion object {
+        private const val THREAD_POOL_SIZE = 5
+    }
+
+    private val executorService: ExecutorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE)
 
     private val httpClient: HttpClient =
         HttpClient

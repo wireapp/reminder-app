@@ -25,8 +25,9 @@ class BearerTokenParamConverterProvider : ParamConverterProvider {
         genericType: Type?,
         annotations: Array<Annotation?>?,
     ): ParamConverter<T>? {
-        if (rawType == String::class.java && genericType?.typeName == BearerToken::class.qualifiedName)
+        if (rawType == String::class.java && genericType?.typeName == BearerToken::class.qualifiedName) {
             return BearerTokenParamConverter() as ParamConverter<T>
+        }
         return null
     }
 }

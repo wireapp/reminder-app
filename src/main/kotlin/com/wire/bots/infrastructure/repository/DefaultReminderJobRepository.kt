@@ -14,7 +14,7 @@ import org.quartz.Scheduler
 import org.quartz.SimpleScheduleBuilder
 import org.quartz.Trigger
 import org.quartz.TriggerBuilder
-import java.util.*
+import java.util.Date
 
 @ApplicationScoped
 class DefaultReminderJobRepository(
@@ -78,7 +78,7 @@ class DefaultReminderJobRepository(
             is Reminder.RecurringReminder -> {
                 ReminderNextSchedule(
                     reminder,
-                    getNextFireTimeForTrigger(trigger, 3),
+                    getNextFireTimeForTrigger(trigger, MAX_NEXT_FIRE_SIZE),
                 )
             }
         }
@@ -105,5 +105,6 @@ class DefaultReminderJobRepository(
     companion object {
         private const val SECONDS_BEFORE_WARMUP = 10L
         private const val SINGLE_TIME_COUNT_JOB = 1
+        private const val MAX_NEXT_FIRE_SIZE = 3
     }
 }

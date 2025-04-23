@@ -1,12 +1,12 @@
-//import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.allopen") version "1.9.22"
     kotlin("plugin.noarg") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
-//    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
-//    id("io.gitlab.arturbosch.detekt") version ("1.23.7")
+    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
+    id("io.gitlab.arturbosch.detekt") version ("1.23.7")
     id("io.quarkus")
 }
 
@@ -47,30 +47,30 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-//ktlint {
-//    verbose.set(true)
-//    outputToConsole.set(true)
-//    coloredOutput.set(true)
-//    reporters {
-//        reporter(ReporterType.CHECKSTYLE)
-//        reporter(ReporterType.JSON)
-//        reporter(ReporterType.HTML)
-//    }
-//    filter {
-//        exclude { element ->
-//            element.file.path.contains("generated/")
-//        }
-//    }
-//}
-//
-//detekt {
-//    toolVersion = "1.23.7"
-//    config.setFrom(file("$rootDir/config/detekt/detekt.yml"))
-//    baseline = file("$rootDir/config/detekt/baseline.xml")
-//    parallel = true
-//    buildUponDefaultConfig = true
-//    source.setFrom("src/main/kotlin")
-//}
+ktlint {
+    verbose.set(true)
+    outputToConsole.set(true)
+    coloredOutput.set(true)
+    reporters {
+        reporter(ReporterType.CHECKSTYLE)
+        reporter(ReporterType.JSON)
+        reporter(ReporterType.HTML)
+    }
+    filter {
+        exclude { element ->
+            element.file.path.contains("generated/")
+        }
+    }
+}
+
+detekt {
+    toolVersion = "1.23.7"
+    config.setFrom(file("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/baseline.xml")
+    parallel = true
+    buildUponDefaultConfig = true
+    source.setFrom("src/main/kotlin")
+}
 
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")

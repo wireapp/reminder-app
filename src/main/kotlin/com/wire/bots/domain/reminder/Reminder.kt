@@ -3,7 +3,7 @@ package com.wire.bots.domain.reminder
 import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.TaskId
 import java.time.Instant
-import java.util.*
+import java.util.Date
 
 sealed interface Reminder {
     val createdAt: Instant

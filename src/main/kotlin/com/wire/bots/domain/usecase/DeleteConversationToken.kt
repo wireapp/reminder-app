@@ -13,5 +13,7 @@ import com.wire.bots.domain.token.TokenRepository
 class DeleteConversationToken(
     private val tokenRepository: TokenRepository,
 ) {
-    operator fun invoke(conversationId: PlainConversationId): Either<Throwable, Unit> = tokenRepository.deleteToken(conversationId)
+    @Suppress("ktlint:standard:function-signature")
+    operator fun invoke(conversationId: PlainConversationId): Either<Throwable, Unit> =
+        tokenRepository.deleteToken(conversationId)
 }

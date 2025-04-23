@@ -21,7 +21,9 @@ class DefaultReminderRepository :
         }
 
     @Transactional
-    override fun countRemindersByConversationId(conversationId: PlainConversationId): Long = count("conversationId", conversationId)
+    @Suppress("ktlint:standard:function-signature")
+    override fun countRemindersByConversationId(conversationId: PlainConversationId): Long =
+        count("conversationId", conversationId)
 
     @Transactional
     override fun getReminderOnConversationId(conversationId: PlainConversationId): Either<Throwable, List<Reminder>> =

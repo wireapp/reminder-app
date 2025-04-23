@@ -10,7 +10,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Date
 
 class TimeParsingTest {
     @Test

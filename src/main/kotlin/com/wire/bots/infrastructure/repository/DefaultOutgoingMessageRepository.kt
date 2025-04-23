@@ -8,7 +8,7 @@ import com.wire.bots.infrastructure.client.ConversationRemoteApi
 import com.wire.bots.infrastructure.toOutgoingMessage
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.slf4j.LoggerFactory
+// import org.slf4j.LoggerFactory
 
 @ApplicationScoped
 class DefaultOutgoingMessageRepository(
