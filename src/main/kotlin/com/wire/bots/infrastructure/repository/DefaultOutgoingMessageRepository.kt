@@ -8,19 +8,17 @@ import com.wire.bots.infrastructure.client.ConversationRemoteApi
 import com.wire.bots.infrastructure.toOutgoingMessage
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import org.slf4j.LoggerFactory
 
 @ApplicationScoped
 class DefaultOutgoingMessageRepository(
-    @RestClient val conversationRemoteApi: ConversationRemoteApi
+    @RestClient val conversationRemoteApi: ConversationRemoteApi,
 ) : OutgoingMessageRepository {
-    private val logger = LoggerFactory.getLogger(this::class.java)
-
     override fun sendMessage(
         conversationId: PlainConversationId,
         token: String,
-        messageContent: String
-    ): Either<Throwable, Unit> = either {
-        conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
-    }
+        messageContent: String,
+    ): Either<Throwable, Unit> =
+        either {
+            conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
+        }
 }

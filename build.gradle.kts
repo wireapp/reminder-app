@@ -6,12 +6,11 @@ plugins {
     kotlin("plugin.noarg") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
-    id("io.gitlab.arturbosch.detekt") version("1.23.7")
+    id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("io.quarkus")
 }
 
 repositories {
-    google()
     mavenCentral()
 }
 
@@ -21,7 +20,7 @@ val quarkusPlatformVersion: String by project
 
 // todo move to catalog, ok for now
 dependencies {
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
     implementation("io.quarkus:quarkus-flyway")
     implementation("io.quarkus:quarkus-quartz")
     implementation("io.quarkus:quarkus-kotlin")
@@ -38,7 +37,6 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
 }
 
 group = "com.wire.bots"
@@ -57,11 +55,6 @@ ktlint {
         reporter(ReporterType.CHECKSTYLE)
         reporter(ReporterType.JSON)
         reporter(ReporterType.HTML)
-    }
-    filter {
-        exclude { element ->
-            element.file.path.contains("generated/")
-        }
     }
 }
 

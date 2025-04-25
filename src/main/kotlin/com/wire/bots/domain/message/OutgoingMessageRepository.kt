@@ -7,6 +7,6 @@ interface OutgoingMessageRepository {
     fun sendMessage(
         conversationId: PlainConversationId,
         token: String,
-        messageContent: String
+        messageContent: String,
     ): Either<Throwable, Unit>
 }

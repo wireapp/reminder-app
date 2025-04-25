@@ -12,10 +12,12 @@ import com.wire.bots.domain.reminder.ReminderRepository
  */
 @DomainComponent
 class ListRemindersInConversation(
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
 ) {
-    operator fun invoke(conversationId: String): Either<Throwable, List<Reminder>> = Either.catch {
-        return reminderRepository.getReminderOnConversationId(conversationId)
-            .flatMap { it.right() }
-    }
+    operator fun invoke(conversationId: String): Either<Throwable, List<Reminder>> =
+        Either.catch {
+            return reminderRepository
+                .getReminderOnConversationId(conversationId)
+                .flatMap { it.right() }
+        }
 }

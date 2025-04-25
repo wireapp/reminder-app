@@ -10,7 +10,11 @@ import com.wire.bots.domain.token.TokenRepository
  * Ensures, that we have a token for the conversation, so we can send messages back to wire-server.
  */
 @DomainComponent
-class SaveConversationToken(private val tokenRepository: TokenRepository) {
-    operator fun invoke(conversationId: PlainConversationId, token: String): Either<Throwable, Unit> =
-        tokenRepository.insertToken(conversationId, token)
+class SaveConversationToken(
+    private val tokenRepository: TokenRepository,
+) {
+    operator fun invoke(
+        conversationId: PlainConversationId,
+        token: String,
+    ): Either<Throwable, Unit> = tokenRepository.insertToken(conversationId, token)
 }

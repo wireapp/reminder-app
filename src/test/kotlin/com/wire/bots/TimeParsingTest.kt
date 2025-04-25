@@ -4,16 +4,15 @@ import com.mdimension.jchronic.Chronic
 import com.mdimension.jchronic.Options
 import com.mdimension.jchronic.tags.Pointer
 import io.github.yamilmedina.kron.NaturalKronParser
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import java.util.Date
 
 class TimeParsingTest {
-
     @Test
     fun givenTomorrowIsGiven_thenTheDateTimeShouldMatchForNowPlusOneDay() {
         // given

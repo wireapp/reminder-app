@@ -22,5 +22,6 @@ data class EventDTO(
 @Serializable
 data class TextContent(
     val data: String,
-    @Transient val mentions: List<String> = emptyList() // todo: map later or never.
+    // todo: map later or never.
+    @Transient val mentions: List<String> = emptyList(),
 )
