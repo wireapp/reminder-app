@@ -3,7 +3,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.allopen") version "1.9.22"
-    kotlin("plugin.noarg") version "1.9.22"
+    kotlin("plugin.noarg") version "2.1.20"
     kotlin("plugin.serialization") version "1.9.22"
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
