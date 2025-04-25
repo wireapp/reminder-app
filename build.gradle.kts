@@ -1,7 +1,7 @@
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.1.20"
     kotlin("plugin.allopen") version "1.9.22"
     kotlin("plugin.noarg") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
