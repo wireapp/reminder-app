@@ -1,10 +1,10 @@
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.allopen") version "1.9.22"
-    kotlin("plugin.noarg") version "1.9.22"
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.allopen") version "2.1.20"
+    kotlin("plugin.noarg") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("io.quarkus")
@@ -24,10 +24,15 @@ dependencies {
     implementation("io.quarkus:quarkus-flyway")
     implementation("io.quarkus:quarkus-quartz")
     implementation("io.quarkus:quarkus-kotlin")
-    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
-    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
-    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
-    implementation("io.quarkus:quarkus-websockets-client")
+//    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
+//    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
+//    implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json") {
+//        version {
+//            strictly("1.8.0")
+//        }
+//    }
+//    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
+//    implementation("io.quarkus:quarkus-websockets-client")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -37,6 +42,7 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    implementation("com.wire:wire-apps-jvm-sdk:0.0.1")
 }
 
 group = "com.wire.bots"
@@ -47,25 +53,25 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-ktlint {
-    verbose.set(true)
-    outputToConsole.set(true)
-    coloredOutput.set(true)
-    reporters {
-        reporter(ReporterType.CHECKSTYLE)
-        reporter(ReporterType.JSON)
-        reporter(ReporterType.HTML)
-    }
-}
-
-detekt {
-    toolVersion = "1.23.7"
-    config.setFrom(file("$rootDir/config/detekt/detekt.yml"))
-    baseline = file("$rootDir/config/detekt/baseline.xml")
-    parallel = true
-    buildUponDefaultConfig = true
-    source.setFrom("src/main/kotlin")
-}
+//ktlint {
+//    verbose.set(true)
+//    outputToConsole.set(true)
+//    coloredOutput.set(true)
+//    reporters {
+//        reporter(ReporterType.CHECKSTYLE)
+//        reporter(ReporterType.JSON)
+//        reporter(ReporterType.HTML)
+//    }
+//}
+//
+//detekt {
+//    toolVersion = "1.23.7"
+//    config.setFrom(file("$rootDir/config/detekt/detekt.yml"))
+//    baseline = file("$rootDir/config/detekt/baseline.xml")
+//    parallel = true
+//    buildUponDefaultConfig = true
+//    source.setFrom("src/main/kotlin")
+//}
 
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")

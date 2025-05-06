@@ -1,15 +1,15 @@
 package com.wire.bots.infrastructure.client
 
-import kotlinx.serialization.Serializable
+// import kotlinx.serialization.Serializable
 
-@Serializable
+// @Serializable
 data class OutgoingMessage(
     val type: OutgoingMessageType,
     val text: MessagePayload.Text? = null,
 )
 
 sealed interface MessagePayload {
-    @Serializable
+//    @Serializable
     data class Text(
         val data: String,
     ) : MessagePayload

@@ -1,0 +1,98 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ */
+
+package com.wire.bots.application
+
+import com.wire.integrations.jvm.WireAppSdk
+import com.wire.integrations.jvm.WireEventsHandler
+import com.wire.integrations.jvm.model.WireMessage
+import io.quarkus.runtime.Startup
+import jakarta.annotation.PostConstruct
+import jakarta.enterprise.context.ApplicationScoped
+import org.slf4j.LoggerFactory
+import java.util.UUID
+
+private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
+
+@ApplicationScoped
+@Startup
+class MlsSdkClient {
+    @PostConstruct
+    fun init() {
+        val wireAppSdk =
+            WireAppSdk(
+                applicationId = UUID.randomUUID(),
+                apiToken = "myApiToken",
+                apiHost = "https://nginz-https.chala.wire.link",
+                cryptographyStoragePassword = "myDummyPassword",
+                object : WireEventsHandler() {
+                    override suspend fun onNewMessageSuspending(wireMessage: WireMessage.Text) {
+                        logger.info("Received Text Message : $wireMessage")
+
+                        val message =
+                            WireMessage.Text.create(
+                                conversationId = wireMessage.conversationId,
+                                text = "${wireMessage.text} -- Sent from the SDK",
+                            )
+
+                        manager.sendMessageSuspending(
+                            conversationId = wireMessage.conversationId,
+                            message = message,
+                        )
+                    }
+
+                    override suspend fun onNewAssetSuspending(wireMessage: WireMessage.Asset) {
+                        logger.info("Received Asset Message : $wireMessage")
+
+                        val message =
+                            WireMessage.Text.create(
+                                conversationId = wireMessage.conversationId,
+                                text = "Received Asset : ${wireMessage.name}",
+                            )
+
+                        manager.sendMessageSuspending(
+                            conversationId = wireMessage.conversationId,
+                            message = message,
+                        )
+
+                        wireMessage.remoteData?.let { remoteData ->
+                            val asset =
+                                manager.downloadAsset(
+                                    assetId = remoteData.assetId,
+                                    assetDomain = remoteData.assetDomain,
+                                    assetToken = remoteData.assetToken,
+                                )
+
+                            logger.info("Downloaded asset in ByteArray: $asset")
+                        }
+                    }
+                },
+            )
+
+        logger.info("Starting Wire Apps SDK...")
+        wireAppSdk.startListening() // Will keep a thread running in the background until explicitly stopped
+        val applicationManager = wireAppSdk.getApplicationManager()
+
+        applicationManager.getStoredTeams().forEach {
+            logger.info("Team: $it")
+        }
+        applicationManager.getStoredConversations().forEach {
+            logger.info("Conversation: $it")
+        }
+        logger.info("Wire backend domain: ${applicationManager.getBackendConfiguration().domain}")
+
+        // Use wireAppSdk.stop() to stop the SDK or just stop it with Ctrl+C/Cmd+C
+    }
+}
