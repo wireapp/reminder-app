@@ -1,12 +1,14 @@
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+//import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.allopen") version "2.1.20"
     kotlin("plugin.noarg") version "2.1.20"
     kotlin("plugin.serialization") version "2.1.20"
-    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.7"
+//    id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
+//    id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("io.quarkus")
 }
 
@@ -24,15 +26,10 @@ dependencies {
     implementation("io.quarkus:quarkus-flyway")
     implementation("io.quarkus:quarkus-quartz")
     implementation("io.quarkus:quarkus-kotlin")
-//    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
-//    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
-//    implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json") {
-//        version {
-//            strictly("1.8.0")
-//        }
-//    }
-//    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
-//    implementation("io.quarkus:quarkus-websockets-client")
+    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
+    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
+    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
+    implementation("io.quarkus:quarkus-websockets-client")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -87,7 +84,14 @@ noArg {
     annotation("jakarta.persistence.Entity")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
-    kotlinOptions.javaParameters = true
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        javaParameters.set(true)
+    }
 }
+
+//tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+//    kotlinOptions.javaParameters = true
+//}
