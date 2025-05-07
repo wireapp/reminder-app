@@ -41,7 +41,7 @@ nb-configuration.xml
 **/demo.properties
 
 # Ignore SQLite database
-*/*.db
+*.db
 
 # Ignore Core-crypto directory
 cryptography
