@@ -12,13 +12,17 @@ import jakarta.transaction.Transactional
 class ReminderTaskExecutor(
     val reminderRepository: DefaultReminderRepository,
     val tokenRepository: TokenRepository,
-    val outgoingMessageRepository: OutgoingMessageRepository,
+    val outgoingMessageRepository: OutgoingMessageRepository
 ) {
     @Transactional
     fun doWork(taskId: String) {
         val reminder = reminderRepository.find("taskId", taskId).singleResult()
         tokenRepository.getToken(reminder.conversationId).flatMap { token ->
-            outgoingMessageRepository.sendMessage(reminder.conversationId, token, reminder.task).flatMap {
+            outgoingMessageRepository.sendMessage(
+                reminder.conversationId,
+                token,
+                reminder.task
+            ).flatMap {
                 either {
                     if (!reminder.isEternal) {
                         reminderRepository.delete(reminder)

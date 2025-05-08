@@ -20,7 +20,7 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("not relevant"),
+                text = TextContent("not relevant")
             )
 
         // when
@@ -40,7 +40,7 @@ class EventMapperTest {
                 type = EventTypeDTO.BOT_REQUEST,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
+                token = "token"
             )
 
         // when
@@ -59,7 +59,7 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.BOT_REMOVED,
                 conversationId = "conversationId",
-                botId = "botId",
+                botId = "botId"
             )
 
         // when
@@ -80,7 +80,7 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("/help"),
+                text = TextContent("/help")
             )
 
         // when
@@ -101,7 +101,7 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("/remind help"),
+                text = TextContent("/remind help")
             )
 
         // when
@@ -122,7 +122,9 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("""/remind to "join the refinement session" "tomorrow at 11:00"""".trimIndent()),
+                text = TextContent(
+                    """/remind to "join the refinement session" "tomorrow at 11:00"""".trimIndent()
+                )
             )
 
         // when
@@ -131,7 +133,10 @@ class EventMapperTest {
         // then
         event.shouldSucceed {
             assertInstanceOf(Command.NewReminder::class.java, it)
-            assertInstanceOf(Reminder.SingleReminder::class.java, (it as Command.NewReminder).reminder)
+            assertInstanceOf(
+                Reminder.SingleReminder::class.java,
+                (it as Command.NewReminder).reminder
+            )
             val reminder = it.reminder as Reminder.SingleReminder
             assertEquals("join the refinement session", reminder.task)
         }
@@ -146,7 +151,9 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("""/remind to "join the daily stand up" "every monday at 10:00"""".trimIndent()),
+                text = TextContent(
+                    """/remind to "join the daily stand up" "every monday at 10:00"""".trimIndent()
+                )
             )
 
         // when
@@ -155,7 +162,10 @@ class EventMapperTest {
         // then
         event.shouldSucceed {
             assertInstanceOf(Command.NewReminder::class.java, it)
-            assertInstanceOf(Reminder.RecurringReminder::class.java, (it as Command.NewReminder).reminder)
+            assertInstanceOf(
+                Reminder.RecurringReminder::class.java,
+                (it as Command.NewReminder).reminder
+            )
             val reminder = it.reminder as Reminder.RecurringReminder
             assertEquals("join the daily stand up", reminder.task)
         }
@@ -170,7 +180,9 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("""/remind to "drink water" "every 1 hours"""".trimIndent()),
+                text = TextContent(
+                    """/remind to "drink water" "every 1 hours"""".trimIndent()
+                )
             )
 
         // when
@@ -179,7 +191,10 @@ class EventMapperTest {
         // then
         event.shouldFail {
             assertInstanceOf(BotError.ReminderError::class.java, it)
-            assertEquals(BotError.ErrorType.INCREMENT_IN_TIMEUNIT, (it as BotError.ReminderError).errorType)
+            assertEquals(
+                BotError.ErrorType.INCREMENT_IN_TIMEUNIT,
+                (it as BotError.ReminderError).errorType
+            )
         }
     }
 
@@ -192,7 +207,7 @@ class EventMapperTest {
                 conversationId = "conversationId",
                 botId = "botId",
                 token = "token",
-                text = TextContent("""/remind to "drink water" "yesterday" """.trimIndent()),
+                text = TextContent("""/remind to "drink water" "yesterday" """.trimIndent())
             )
 
         // when

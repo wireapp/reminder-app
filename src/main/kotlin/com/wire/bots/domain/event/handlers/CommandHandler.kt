@@ -14,15 +14,23 @@ import com.wire.bots.domain.usecase.SaveReminderSchedule
 class CommandHandler(
     private val outgoingMessageRepository: OutgoingMessageRepository,
     private val saveReminderSchedule: SaveReminderSchedule,
-    private val listRemindersInConversation: ListRemindersInConversation,
+    private val listRemindersInConversation: ListRemindersInConversation
 ) : EventHandler<Command> {
     override fun onEvent(event: Command): Either<Throwable, Unit> =
         when (event) {
             is Command.LegacyHelp ->
-                outgoingMessageRepository.sendMessage(event.conversationId, event.token, createLegacyHelpMessage())
+                outgoingMessageRepository.sendMessage(
+                    event.conversationId,
+                    event.token,
+                    createLegacyHelpMessage()
+                )
 
             is Command.Help ->
-                outgoingMessageRepository.sendMessage(event.conversationId, event.token, createHelpMessage())
+                outgoingMessageRepository.sendMessage(
+                    event.conversationId,
+                    event.token,
+                    createHelpMessage()
+                )
 
             is Command.NewReminder -> handleNewReminder(event)
             is Command.ListReminders -> getReminderListMessage(event)
@@ -45,20 +53,28 @@ class CommandHandler(
 
     private fun handleNewReminder(command: Command.NewReminder): Either<Throwable, Unit> =
         saveReminderSchedule(command.reminder).flatMap {
-            outgoingMessageRepository.sendMessage(command.conversationId, command.token, getCreatedMessage(it))
+            outgoingMessageRepository.sendMessage(
+                command.conversationId,
+                command.token,
+                getCreatedMessage(it)
+            )
         }
 
     private fun getCreatedMessage(reminderNextSchedule: ReminderNextSchedule): String =
         when (val reminder = reminderNextSchedule.reminder) {
             is Reminder.SingleReminder -> {
-                "I will remind you to '${reminder.task}' at ${reminderNextSchedule.nextSchedules.first()}.\n" +
-                    "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`"
+                "I will remind you to '${reminder.task}' " +
+                    "at ${reminderNextSchedule.nextSchedules.first()}.\n" +
+                    "If you want to delete it, you can use the command " +
+                    "`/remind delete ${reminder.taskId}`"
             }
 
             is Reminder.RecurringReminder -> {
                 "I will periodically remind you to '${reminder.task}'.\n" +
-                    "If you want to delete it, you can use the command `/remind delete ${reminder.taskId}`\n\n" +
-                    "The next ${reminderNextSchedule.nextSchedules.size} schedules for the reminder is:\n" +
+                    "If you want to delete it, you can use the command " +
+                    "`/remind delete ${reminder.taskId}`\n\n" +
+                    "The next ${reminderNextSchedule.nextSchedules.size} " +
+                    "schedules for the reminder is:\n" +
                     reminderNextSchedule.nextSchedules.joinToString("\n") {
                         "- $it"
                     }

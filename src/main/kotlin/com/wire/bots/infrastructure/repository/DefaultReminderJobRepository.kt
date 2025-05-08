@@ -18,7 +18,7 @@ import java.util.Date
 
 @ApplicationScoped
 class DefaultReminderJobRepository(
-    private val quartz: Scheduler,
+    private val quartz: Scheduler
 ) : ReminderJobRepository {
     override fun scheduleReminderJob(reminder: Reminder): Either<Throwable, ReminderNextSchedule> {
         val job =
@@ -42,16 +42,24 @@ class DefaultReminderJobRepository(
             is Reminder.SingleReminder -> {
                 TriggerBuilder
                     .newTrigger()
-                    .withIdentity("mySingleTriggerFor_${reminder.taskId}", reminder.conversationId)
+                    .withIdentity(
+                        "mySingleTriggerFor_${reminder.taskId}",
+                        reminder.conversationId
+                    )
                     .startAt(Date.from(reminder.scheduledAt.minusSeconds(SECONDS_BEFORE_WARMUP)))
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForTotalCount(SINGLE_TIME_COUNT_JOB))
+                    .withSchedule(
+                        SimpleScheduleBuilder.repeatSecondlyForTotalCount(SINGLE_TIME_COUNT_JOB)
+                    )
                     .build()
             }
 
             is Reminder.RecurringReminder -> {
                 TriggerBuilder
                     .newTrigger()
-                    .withIdentity("myRecurringTriggerFor_${reminder.taskId}", reminder.conversationId)
+                    .withIdentity(
+                        "myRecurringTriggerFor_${reminder.taskId}",
+                        reminder.conversationId
+                    )
                     .startNow()
                     .withSchedule(CronScheduleBuilder.cronSchedule(reminder.scheduledCron))
                     .build()
@@ -65,20 +73,20 @@ class DefaultReminderJobRepository(
      */
     private fun getNextReminderNextRun(
         reminder: Reminder,
-        trigger: Trigger,
+        trigger: Trigger
     ): ReminderNextSchedule =
         when (reminder) {
             is Reminder.SingleReminder -> {
                 ReminderNextSchedule(
                     reminder,
-                    listOf(trigger.nextFireTime),
+                    listOf(trigger.nextFireTime)
                 )
             }
 
             is Reminder.RecurringReminder -> {
                 ReminderNextSchedule(
                     reminder,
-                    getNextFireTimeForTrigger(trigger, MAX_NEXT_FIRE_SIZE),
+                    getNextFireTimeForTrigger(trigger, MAX_NEXT_FIRE_SIZE)
                 )
             }
         }
@@ -90,7 +98,7 @@ class DefaultReminderJobRepository(
      */
     private fun getNextFireTimeForTrigger(
         trigger: Trigger,
-        maxNextFireSize: Int = 3,
+        maxNextFireSize: Int = 3
     ): List<Date> {
         val runs: MutableList<Date> = ArrayList()
         var next = trigger.nextFireTime

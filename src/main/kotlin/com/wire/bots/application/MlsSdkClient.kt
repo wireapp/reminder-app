@@ -17,11 +17,14 @@ package com.wire.bots.application
 
 import com.wire.integrations.jvm.WireAppSdk
 import com.wire.integrations.jvm.WireEventsHandler
+import com.wire.integrations.jvm.model.AssetResource
 import com.wire.integrations.jvm.model.WireMessage
+import com.wire.integrations.jvm.model.asset.AssetRetention
 import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.util.UUID
 
 private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
@@ -41,15 +44,30 @@ class MlsSdkClient {
                     override suspend fun onNewMessageSuspending(wireMessage: WireMessage.Text) {
                         logger.info("Received Text Message : $wireMessage")
 
+                        if (wireMessage.text?.contains("asset") ?: false) {
+                            val resourcePath =
+                                javaClass.classLoader.getResource("banana-icon.png")?.path
+                                    ?: error("Test resource 'banana-icon.png' not found")
+                            val originalData = File(resourcePath).readBytes()
+
+                            manager.uploadAndSendMessageSuspending(
+                                conversationId = wireMessage.conversationId,
+                                asset = AssetResource(originalData),
+                                mimeType = "image/png",
+                                retention = AssetRetention.VOLATILE
+                            )
+                            return
+                        }
+
                         val message =
                             WireMessage.Text.create(
                                 conversationId = wireMessage.conversationId,
-                                text = "${wireMessage.text} -- Sent from the SDK",
+                                text = "${wireMessage.text} -- Sent from the SDK"
                             )
 
                         manager.sendMessageSuspending(
                             conversationId = wireMessage.conversationId,
-                            message = message,
+                            message = message
                         )
                     }
 
@@ -59,30 +77,55 @@ class MlsSdkClient {
                         val message =
                             WireMessage.Text.create(
                                 conversationId = wireMessage.conversationId,
-                                text = "Received Asset : ${wireMessage.name}",
+                                text = "Received Asset : ${wireMessage.name}"
                             )
 
                         manager.sendMessageSuspending(
                             conversationId = wireMessage.conversationId,
-                            message = message,
+                            message = message
                         )
 
                         wireMessage.remoteData?.let { remoteData ->
-                            val asset =
-                                manager.downloadAsset(
-                                    assetId = remoteData.assetId,
-                                    assetDomain = remoteData.assetDomain,
-                                    assetToken = remoteData.assetToken,
-                                )
-
-                            logger.info("Downloaded asset in ByteArray: $asset")
+                            val asset = manager.downloadAssetSuspending(remoteData)
+                            val fileName = wireMessage.name ?: "unknown-${UUID.randomUUID()}"
+                            val outputDir = File("build/downloaded_assets").apply { mkdirs() }
+                            val outputFile = File(outputDir, fileName)
+                            outputFile.writeBytes(asset.value)
+                            logger.info(
+                                "Downloaded asset with size: ${asset.value.size} bytes," +
+                                    " saved to: ${outputFile.absolutePath}"
+                            )
                         }
                     }
-                },
+
+                    override suspend fun onNewCompositeSuspending(
+                        wireMessage: WireMessage.Composite
+                    ) {
+                        logger.info("Received Composite Message : $wireMessage")
+
+                        logger.info("Received Composite Items:")
+                        wireMessage.items.forEach {
+                            logger.info("Composite Item: $it")
+                        }
+                    }
+
+                    override suspend fun onNewButtonActionSuspending(
+                        wireMessage: WireMessage.ButtonAction
+                    ) {
+                        logger.info("Received ButtonAction Message : $wireMessage")
+                    }
+
+                    override suspend fun onNewButtonActionConfirmationSuspending(
+                        wireMessage: WireMessage.ButtonActionConfirmation
+                    ) {
+                        logger.info("Received ButtonActionConfirmation Message : $wireMessage")
+                    }
+                }
             )
 
         logger.info("Starting Wire Apps SDK...")
-        wireAppSdk.startListening() // Will keep a thread running in the background until explicitly stopped
+        wireAppSdk.startListening()
+        // Will keep a thread running in the background until explicitly stopped
         val applicationManager = wireAppSdk.getApplicationManager()
 
         applicationManager.getStoredTeams().forEach {

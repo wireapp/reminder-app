@@ -16,6 +16,6 @@ interface ConversationRemoteApi {
     @Consumes("application/json")
     fun sendMessage(
         @HeaderParam(AUTHORIZATION) token: BearerToken,
-        messageContent: OutgoingMessage,
+        messageContent: OutgoingMessage
     )
 }

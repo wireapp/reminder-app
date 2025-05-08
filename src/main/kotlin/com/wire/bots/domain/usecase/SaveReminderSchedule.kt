@@ -25,12 +25,14 @@ import jakarta.transaction.Transactional
 @DomainComponent
 class SaveReminderSchedule(
     private val reminderRepository: ReminderRepository,
-    private val reminderJobRepository: ReminderJobRepository,
+    private val reminderJobRepository: ReminderJobRepository
 ) {
     @Transactional
     operator fun invoke(reminder: Reminder): Either<Throwable, ReminderNextSchedule> =
         Either.catch {
-            if (reminderRepository.countRemindersByConversationId(reminder.conversationId) >= MAX_REMINDER_JOBS) {
+            if (reminderRepository.countRemindersByConversationId(reminder.conversationId) >=
+                MAX_REMINDER_JOBS
+            ) {
                 return MaxReminderJobsReached().left()
             }
 
@@ -41,7 +43,7 @@ class SaveReminderSchedule(
         }
 
     data class MaxReminderJobsReached(
-        val max: Int = MAX_REMINDER_JOBS,
+        val max: Int = MAX_REMINDER_JOBS
     ) : Throwable("Max reminder jobs reached: $max")
 
     companion object {

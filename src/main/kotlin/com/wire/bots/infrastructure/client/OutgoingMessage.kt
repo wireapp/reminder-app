@@ -5,16 +5,16 @@ package com.wire.bots.infrastructure.client
 // @Serializable
 data class OutgoingMessage(
     val type: OutgoingMessageType,
-    val text: MessagePayload.Text? = null,
+    val text: MessagePayload.Text? = null
 )
 
 sealed interface MessagePayload {
 //    @Serializable
     data class Text(
-        val data: String,
+        val data: String
     ) : MessagePayload
 }
 
 enum class OutgoingMessageType {
-    Text,
+    Text
 }

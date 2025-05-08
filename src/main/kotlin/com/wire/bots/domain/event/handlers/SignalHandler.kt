@@ -9,7 +9,7 @@ import com.wire.bots.domain.usecase.SaveConversationToken
 @DomainComponent
 class SignalHandler(
     private val saveConversationToken: SaveConversationToken,
-    private val deleteConversationToken: DeleteConversationToken,
+    private val deleteConversationToken: DeleteConversationToken
 ) : EventHandler<Signal> {
     override fun onEvent(event: Signal): Either<Throwable, Unit> =
         when (event) {

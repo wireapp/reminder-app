@@ -23,7 +23,7 @@ class RomanWebsocketClient(
     private val baseUrl: String,
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.bot-key")
     private val botApiKey: String,
-    private val eventProcessor: EventProcessor,
+    private val eventProcessor: EventProcessor
 ) : WebSocket.Listener {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -62,7 +62,7 @@ class RomanWebsocketClient(
     override fun onText(
         webSocket: WebSocket?,
         data: CharSequence?,
-        last: Boolean,
+        last: Boolean
     ): CompletionStage<*> {
         super.onText(webSocket, data, last)
         logger.debug("Message received raw: $data")
@@ -75,7 +75,7 @@ class RomanWebsocketClient(
             ifRight = { event ->
                 logger.info("Processing command parsed to: $event")
                 eventProcessor.process(event)
-            },
+            }
         )
         return CompletableFuture<Void>()
     }
@@ -83,7 +83,7 @@ class RomanWebsocketClient(
     override fun onClose(
         webSocket: WebSocket?,
         statusCode: Int,
-        reason: String?,
+        reason: String?
     ): CompletionStage<*> {
         super.onClose(webSocket, statusCode, reason)
         logger.info("Websocket close: ${reason ?: "no reason"}, reopening...")
@@ -93,7 +93,7 @@ class RomanWebsocketClient(
 
     override fun onError(
         webSocket: WebSocket?,
-        error: Throwable?,
+        error: Throwable?
     ) {
         super.onError(webSocket, error)
         logger.info("Websocket error: ${error?.message}, reopening...")

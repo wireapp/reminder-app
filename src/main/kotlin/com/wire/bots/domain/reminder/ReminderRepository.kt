@@ -8,5 +8,7 @@ interface ReminderRepository {
 
     fun countRemindersByConversationId(conversationId: PlainConversationId): Long
 
-    fun getReminderOnConversationId(conversationId: PlainConversationId): Either<Throwable, List<Reminder>>
+    fun getReminderOnConversationId(
+        conversationId: PlainConversationId
+    ): Either<Throwable, List<Reminder>>
 }

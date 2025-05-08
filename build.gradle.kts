@@ -21,7 +21,11 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
-    implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
+    implementation(
+        enforcedPlatform(
+            "$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"
+        )
+    )
 
     // Core Quarkus modules
     implementation("io.quarkus:quarkus-arc")
@@ -48,7 +52,7 @@ dependencies {
     implementation("com.rubiconproject.oss:jchronic:0.2.8")
     implementation("io.github.yamilmedina:natural-kron:2.0.0")
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
-    implementation("com.wire:wire-apps-jvm-sdk:0.0.2")
+    implementation("com.wire:wire-apps-jvm-sdk:0.0.4")
 
     // Test dependencies
     testImplementation("io.quarkus:quarkus-junit5")

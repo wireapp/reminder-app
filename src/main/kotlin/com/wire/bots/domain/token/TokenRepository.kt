@@ -6,7 +6,7 @@ import com.wire.bots.domain.PlainConversationId
 interface TokenRepository {
     fun insertToken(
         conversationId: PlainConversationId,
-        newToken: String,
+        newToken: String
     ): Either<Throwable, Unit>
 
     fun getToken(conversationId: PlainConversationId): Either<Throwable, String>
