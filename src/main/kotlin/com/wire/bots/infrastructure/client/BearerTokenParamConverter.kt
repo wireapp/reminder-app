@@ -34,9 +34,7 @@ class BearerTokenParamConverterProvider : ParamConverterProvider {
         genericType: Type?,
         annotations: Array<Annotation?>?
     ): ParamConverter<T>? {
-        if (rawType ==
-            String::class.java
-        ) {
+        if (rawType == String::class.java) {
             return safeCast<ParamConverter<T>>(BearerTokenParamConverter())
         }
         return null
