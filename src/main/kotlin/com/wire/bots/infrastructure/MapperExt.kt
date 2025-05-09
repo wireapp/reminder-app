@@ -15,7 +15,7 @@ fun Reminder.toEntity(): ReminderEntity =
                 task = this.task,
                 createdAt = this.createdAt,
                 scheduledCron = this.scheduledCron,
-                isEternal = true,
+                isEternal = true
             )
 
         is Reminder.SingleReminder ->
@@ -25,7 +25,7 @@ fun Reminder.toEntity(): ReminderEntity =
                 task = this.task,
                 scheduledAt = this.scheduledAt,
                 createdAt = this.createdAt,
-                isEternal = false,
+                isEternal = false
             )
     }
 
@@ -36,7 +36,7 @@ fun ReminderEntity.toDomain(): Reminder {
             taskId = this.taskId,
             task = this.task,
             scheduledCron = this.scheduledCron!!,
-            createdAt = this.createdAt,
+            createdAt = this.createdAt
         )
 
         false ->
@@ -45,7 +45,7 @@ fun ReminderEntity.toDomain(): Reminder {
                 taskId = this.taskId,
                 task = this.task,
                 scheduledAt = this.scheduledAt!!,
-                createdAt = this.createdAt,
+                createdAt = this.createdAt
             )
     }
 }
@@ -53,5 +53,5 @@ fun ReminderEntity.toDomain(): Reminder {
 fun String.toOutgoingMessage(): OutgoingMessage =
     OutgoingMessage(
         type = OutgoingMessageType.Text,
-        text = MessagePayload.Text(this),
+        text = MessagePayload.Text(this)
     )

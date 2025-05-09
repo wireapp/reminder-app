@@ -11,10 +11,10 @@ import com.wire.bots.domain.token.TokenRepository
  */
 @DomainComponent
 class SaveConversationToken(
-    private val tokenRepository: TokenRepository,
+    private val tokenRepository: TokenRepository
 ) {
     operator fun invoke(
         conversationId: PlainConversationId,
-        token: String,
+        token: String
     ): Either<Throwable, Unit> = tokenRepository.insertToken(conversationId, token)
 }

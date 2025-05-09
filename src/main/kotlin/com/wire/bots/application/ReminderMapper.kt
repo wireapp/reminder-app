@@ -16,22 +16,30 @@ import java.util.UUID
 
 object ReminderMapper {
     private val INVALID_TIME_TOKENS = listOf("hour", "minute", "second")
-    private val VALID_RECURRENT_TOKENS = listOf("every") // todo: expand later, eg. each, daily, weekly, etc.
+    private val VALID_RECURRENT_TOKENS = listOf("every")
+    // todo: expand later, each, daily, weekly, etc.
+
     private val naturalKronParser = NaturalKronParser()
 
-    private fun isRecurrentSchedule(schedule: String): Boolean = VALID_RECURRENT_TOKENS.any { schedule.contains(it) }
+    private fun isRecurrentSchedule(schedule: String): Boolean =
+        VALID_RECURRENT_TOKENS.any { schedule.contains(it) }
 
-    private fun containsInvalidTimeTokens(schedule: String): Boolean = INVALID_TIME_TOKENS.any { schedule.contains(it) }
+    private fun containsInvalidTimeTokens(schedule: String): Boolean =
+        INVALID_TIME_TOKENS.any { schedule.contains(it) }
 
     fun parseReminder(
         conversationId: String,
         token: String,
         task: String,
-        schedule: String,
+        schedule: String
     ): Either<BotError, Event> =
         when {
             isRecurrentSchedule(schedule) && containsInvalidTimeTokens(schedule) -> {
-                BotError.ReminderError(conversationId, token, BotError.ErrorType.INCREMENT_IN_TIMEUNIT).left()
+                BotError.ReminderError(
+                    conversationId,
+                    token,
+                    BotError.ErrorType.INCREMENT_IN_TIMEUNIT
+                ).left()
             }
 
             VALID_RECURRENT_TOKENS.any { schedule.contains(it) } -> {
@@ -45,13 +53,17 @@ object ReminderMapper {
         schedule: String,
         conversationId: String,
         token: String,
-        task: String,
+        task: String
     ): Either<BotError.ReminderError, Command.NewReminder> {
         return runCatching {
             val parsedSchedule = Chronic.parse(schedule, Options(Pointer.PointerType.FUTURE))
             val parsedDate = parsedSchedule.beginCalendar.toInstant()
             if (parsedDate.isBefore(Instant.now())) {
-                return BotError.ReminderError(conversationId, token, BotError.ErrorType.DATE_IN_PAST).left()
+                return BotError.ReminderError(
+                    conversationId,
+                    token,
+                    BotError.ErrorType.DATE_IN_PAST
+                ).left()
             }
             Command
                 .NewReminder(
@@ -61,8 +73,8 @@ object ReminderMapper {
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
                         task = task,
-                        scheduledAt = parsedDate,
-                    ),
+                        scheduledAt = parsedDate
+                    )
                 ).right()
         }.getOrElse {
             BotError.ReminderError(conversationId, token, BotError.ErrorType.PARSE_ERROR).left()
@@ -73,7 +85,7 @@ object ReminderMapper {
         conversationId: String,
         token: String,
         task: String,
-        schedule: String,
+        schedule: String
     ): Either<BotError.ReminderError, Command.NewReminder> =
         runCatching {
             Command
@@ -84,8 +96,8 @@ object ReminderMapper {
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
                         task = task,
-                        scheduledCron = naturalKronParser.parse(schedule),
-                    ),
+                        scheduledCron = naturalKronParser.parse(schedule)
+                    )
                 ).right()
         }.getOrElse {
             BotError.ReminderError(conversationId, token, BotError.ErrorType.PARSE_ERROR).left()

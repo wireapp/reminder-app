@@ -15,43 +15,70 @@ class ReminderMapperTest {
         // then
         result.shouldFail {
             assertInstanceOf(BotError.ReminderError::class.java, it)
-            assertEquals(BotError.ErrorType.INCREMENT_IN_TIMEUNIT.message, (it as BotError.ReminderError).reason)
+            assertEquals(
+                BotError.ErrorType.INCREMENT_IN_TIMEUNIT.message,
+                (it as BotError.ReminderError).reason
+            )
         }
     }
 
     @Test
     fun givenASchedule_whenIsInThePast_ThenRaiseError() {
         // given - when
-        val result = ReminderMapper.parseReminder("conversationId", "token", "task", "on 1990-01-01")
+        val result = ReminderMapper.parseReminder(
+            "conversationId",
+            "token",
+            "task",
+            "on 1990-01-01"
+        )
 
         // then
         result.shouldFail {
             assertInstanceOf(BotError.ReminderError::class.java, it)
-            assertEquals(BotError.ErrorType.DATE_IN_PAST.message, (it as BotError.ReminderError).reason)
+            assertEquals(
+                BotError.ErrorType.DATE_IN_PAST.message,
+                (it as BotError.ReminderError).reason
+            )
         }
     }
 
     @Test
     fun givenASchedule_whenContainsNotBeingAbleToParse_ThenRaiseError() {
         // given - when
-        val result = ReminderMapper.parseReminder("conversationId", "token", "task", "SOME INVALID SCHEDULE")
+        val result = ReminderMapper.parseReminder(
+            "conversationId",
+            "token",
+            "task",
+            "SOME INVALID SCHEDULE"
+        )
 
         // then
         result.shouldFail {
             assertInstanceOf(BotError.ReminderError::class.java, it)
-            assertEquals(BotError.ErrorType.PARSE_ERROR.message, (it as BotError.ReminderError).reason)
+            assertEquals(
+                BotError.ErrorType.PARSE_ERROR.message,
+                (it as BotError.ReminderError).reason
+            )
         }
     }
 
     @Test
     fun givenASchedule_whenContainsNotBeingAbleToParseExpression_ThenRaiseError() {
         // given - when
-        val result = ReminderMapper.parseReminder("conversationId", "token", "task", "not/valid/expression")
+        val result = ReminderMapper.parseReminder(
+            "conversationId",
+            "token",
+            "task",
+            "not/valid/expression"
+        )
 
         // then
         result.shouldFail {
             assertInstanceOf(BotError.ReminderError::class.java, it)
-            assertEquals(BotError.ErrorType.PARSE_ERROR.message, (it as BotError.ReminderError).reason)
+            assertEquals(
+                BotError.ErrorType.PARSE_ERROR.message,
+                (it as BotError.ReminderError).reason
+            )
         }
     }
 }

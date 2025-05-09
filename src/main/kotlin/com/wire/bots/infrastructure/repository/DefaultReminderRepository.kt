@@ -27,7 +27,9 @@ class DefaultReminderRepository :
     }
 
     @Transactional
-    override fun getReminderOnConversationId(conversationId: PlainConversationId): Either<Throwable, List<Reminder>> =
+    override fun getReminderOnConversationId(
+        conversationId: PlainConversationId
+    ): Either<Throwable, List<Reminder>> =
         Either.catch {
             list("conversationId", conversationId).map { it.toDomain() }
         }

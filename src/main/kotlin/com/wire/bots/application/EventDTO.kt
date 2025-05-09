@@ -16,12 +16,12 @@ data class EventDTO(
     val conversation: String? = null,
     val messageId: String? = null,
     val refMessageId: String? = null,
-    val emoji: String? = null,
+    val emoji: String? = null
 )
 
 @Serializable
 data class TextContent(
     val data: String,
     // todo: map later or never.
-    @Transient val mentions: List<String> = emptyList(),
+    @Transient val mentions: List<String> = emptyList()
 )

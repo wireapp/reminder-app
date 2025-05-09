@@ -16,7 +16,7 @@ class DefaultTokenRepository :
     @Transactional
     override fun insertToken(
         conversationId: PlainConversationId,
-        newToken: String,
+        newToken: String
     ): Either<Throwable, Unit> =
         either {
             persist(TokenEntity(conversationId, newToken))
@@ -24,10 +24,11 @@ class DefaultTokenRepository :
 
     override fun getToken(conversationId: PlainConversationId): Either<Throwable, String> =
         either {
-            find("conversationId", sort = Sort.by("createdAt", Sort.Direction.Descending), conversationId)
-                .list()
-                .first()
-                .token
+            find(
+                "conversationId",
+                sort = Sort.by("createdAt", Sort.Direction.Descending),
+                conversationId
+            ).list().first().token
         }
 
     @Transactional

@@ -16,7 +16,7 @@ sealed interface Reminder {
         override val conversationId: PlainConversationId,
         override val taskId: TaskId,
         override val task: String,
-        val scheduledAt: Instant,
+        val scheduledAt: Instant
     ) : Reminder
 
     data class RecurringReminder(
@@ -24,11 +24,11 @@ sealed interface Reminder {
         override val conversationId: PlainConversationId,
         override val taskId: TaskId,
         override val task: String,
-        val scheduledCron: String,
+        val scheduledCron: String
     ) : Reminder
 }
 
 class ReminderNextSchedule(
     val reminder: Reminder,
-    val nextSchedules: List<Date>,
+    val nextSchedules: List<Date>
 )

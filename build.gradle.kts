@@ -1,10 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.allopen") version "1.9.22"
-    kotlin("plugin.noarg") version "1.9.22"
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.allopen") version "2.1.20"
+    kotlin("plugin.noarg") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("io.quarkus")
@@ -18,23 +20,51 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
-// todo move to catalog, ok for now
+/*
+* Forcing protobuf versions to avoid conflicts with Quarkus dependencies.
+ */
+configurations.all {
+    resolutionStrategy {
+        force("com.google.protobuf:protobuf-java:4.30.0")
+        force("com.google.protobuf:protobuf-kotlin:4.30.0")
+    }
+}
+
 dependencies {
-    implementation(enforcedPlatform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
+    implementation(
+        enforcedPlatform(
+            "$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"
+        )
+    )
+
+    // Core Quarkus modules
+    implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-flyway")
     implementation("io.quarkus:quarkus-quartz")
-    implementation("io.quarkus:quarkus-kotlin")
-    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin")
-    implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
-    implementation("io.quarkus:quarkus-rest-client-reactive-kotlin-serialization")
-    implementation("io.quarkus:quarkus-websockets-client")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
+
+    // Kotlin support
+    implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
+
+    // RESTEasy Reactive (new group ID)
+    implementation("io.quarkus.resteasy.reactive:resteasy-reactive")
+    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jackson")
+    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jsonb")
+    implementation("io.quarkus:quarkus-rest-client-kotlin-serialization")
+
+    // WebSocket
+    implementation("io.quarkus:quarkus-websockets-client")
+
+    // Other project dependencies
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("io.quarkus:quarkus-arc")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     implementation("com.rubiconproject.oss:jchronic:0.2.8")
     implementation("io.github.yamilmedina:natural-kron:2.0.0")
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
+    implementation("com.wire:wire-apps-jvm-sdk:0.0.4")
+
+    // Test dependencies
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
@@ -81,7 +111,9 @@ noArg {
     annotation("jakarta.persistence.Entity")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
-    kotlinOptions.javaParameters = true
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        javaParameters.set(true)
+    }
 }

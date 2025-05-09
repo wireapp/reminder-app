@@ -24,7 +24,10 @@ class TimeParsingTest {
 
         // then
         with(dateSpan.beginCalendar) {
-            assertEquals(expected.truncatedTo(ChronoUnit.DAYS), toInstant().truncatedTo(ChronoUnit.DAYS))
+            assertEquals(
+                expected.truncatedTo(ChronoUnit.DAYS),
+                toInstant().truncatedTo(ChronoUnit.DAYS)
+            )
         }
     }
 
@@ -39,7 +42,10 @@ class TimeParsingTest {
 
         // then
         with(dateSpan.beginCalendar) {
-            assertEquals(expected.truncatedTo(ChronoUnit.DAYS), toInstant().truncatedTo(ChronoUnit.DAYS))
+            assertEquals(
+                expected.truncatedTo(ChronoUnit.DAYS),
+                toInstant().truncatedTo(ChronoUnit.DAYS)
+            )
         }
     }
 

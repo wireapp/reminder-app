@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 class EventProcessor(
     val commandHandler: CommandHandler,
     val signalHandler: SignalHandler,
-    val outgoingMessageRepository: OutgoingMessageRepository,
+    val outgoingMessageRepository: OutgoingMessageRepository
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -32,7 +32,7 @@ class EventProcessor(
             outgoingMessageRepository.sendMessage(
                 conversationId = event.conversationId,
                 token = event.token,
-                messageContent = getErrorMessage(unhandled),
+                messageContent = getErrorMessage(unhandled)
             )
             unhandled
         }
@@ -51,7 +51,10 @@ class EventProcessor(
             is BotError.Skip -> logger.warn("Event skipped, not necessary to handle").right()
             is BotError.ReminderError -> handleErrorMessage(error)
         }.mapLeft { unhandled ->
-            logger.error("Fatal! Error while processing error, closing the door from outside", unhandled)
+            logger.error(
+                "Fatal! Error while processing error, closing the door from outside",
+                unhandled
+            )
             unhandled
         }
 
@@ -59,6 +62,6 @@ class EventProcessor(
         outgoingMessageRepository.sendMessage(
             error.conversationId,
             error.token,
-            error.reason,
+            error.reason
         )
 }
