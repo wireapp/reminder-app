@@ -20,6 +20,9 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
+/*
+* Forcing protobuf versions to avoid conflicts with Quarkus dependencies.
+ */
 configurations.all {
     resolutionStrategy {
         force("com.google.protobuf:protobuf-java:4.30.0")

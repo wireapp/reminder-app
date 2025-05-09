@@ -29,6 +29,11 @@ import java.util.UUID
 
 private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
 
+/*
+* EchoBot is used only to demonstrate the usage of the Wire Apps SDK with Quarkus.
+* It will echo back the messages sent to it and used only for testing purposes.
+* It will be replaced with MlsSdkClient implementation in the future.
+ */
 @ApplicationScoped
 @Startup
 class MlsSdkClient {

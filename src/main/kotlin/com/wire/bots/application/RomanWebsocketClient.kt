@@ -1,7 +1,5 @@
 package com.wire.bots.application
 
-// import jakarta.enterprise.context.ApplicationScoped
-// import io.quarkus.runtime.Startup
 import com.wire.bots.domain.event.EventProcessor
 import com.wire.bots.infrastructure.LenientJson
 import jakarta.annotation.PostConstruct
@@ -16,8 +14,9 @@ import java.util.concurrent.CompletionStage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-// @ApplicationScoped
-// @Startup
+/*
+* Deprecated: This class is not used anymore. Use [MlsSdkClient] instead.
+*/
 class RomanWebsocketClient(
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.url")
     private val baseUrl: String,
