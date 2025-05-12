@@ -1,6 +1,7 @@
-# Wire Reminders Bot
+# Wire Remind-App (ex. Reminders-Bot)
+### Is migrating from Roman to MLS with WireSDK. Act as an Echo bot at the moment.
 
-This is a bot that can create reminders for you and your group, and send you a message when the reminder is due.
+This is an app that can create reminders for you and your group, and send you a message when the reminder is due.
 
 > [!IMPORTANT]  
 > As of now, the bot only supports a maximum of 3 active reminders per group, and recurrent reminders are supported only up to 5 repetitions.

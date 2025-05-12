@@ -14,9 +14,7 @@ typealias BearerToken = String
  * @param input The object to be cast.
  * @return The object casted to the specified type, or null if the cast is not possible.
  */
-inline fun <reified T> safeCast(input: Any): T? {
-    return input as? T
-}
+inline fun <reified T> safeCast(input: Any): T? = input as? T
 
 /**
  * Param converter for BearerToken.
@@ -34,9 +32,11 @@ class BearerTokenParamConverterProvider : ParamConverterProvider {
     override fun <T> getConverter(
         rawType: Class<T>,
         genericType: Type?,
-        annotations: Array<Annotation?>?,
+        annotations: Array<Annotation?>?
     ): ParamConverter<T>? {
-        if (rawType == String::class.java) return safeCast<ParamConverter<T>>(BearerTokenParamConverter())
+        if (rawType == String::class.java) {
+            return safeCast<ParamConverter<T>>(BearerTokenParamConverter())
+        }
         return null
     }
 }

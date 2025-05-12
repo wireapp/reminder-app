@@ -37,3 +37,11 @@ nb-configuration.xml
 
 # Plugin directory
 /.quarkus/cli/plugins/
+
+**/demo.properties
+
+# Ignore SQLite database
+*.db
+
+# Ignore Core-crypto directory
+cryptography
