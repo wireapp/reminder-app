@@ -2,6 +2,7 @@ package com.wire.bots.infrastructure.repository
 
 import arrow.core.Either
 import arrow.core.raise.either
+import com.wire.bots.application.MlsSdkClient
 import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.infrastructure.client.ConversationRemoteApi
@@ -11,7 +12,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 
 @ApplicationScoped
 class DefaultOutgoingMessageRepository(
-    @RestClient val conversationRemoteApi: ConversationRemoteApi
+    val conversationRemoteApi: MlsSdkClient
 ) : OutgoingMessageRepository {
     override fun sendMessage(
         conversationId: PlainConversationId,
@@ -19,6 +20,6 @@ class DefaultOutgoingMessageRepository(
         messageContent: String
     ): Either<Throwable, Unit> =
         either {
-            conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
+            conversationRemoteApi.getManager().sendMessage()
         }
 }

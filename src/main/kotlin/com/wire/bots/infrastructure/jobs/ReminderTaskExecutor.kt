@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.domain.token.TokenRepository
 import com.wire.bots.infrastructure.repository.DefaultReminderRepository
+import com.wire.integrations.jvm.service.WireApplicationManager
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
 
@@ -12,7 +13,7 @@ import jakarta.transaction.Transactional
 class ReminderTaskExecutor(
     val reminderRepository: DefaultReminderRepository,
     val tokenRepository: TokenRepository,
-    val outgoingMessageRepository: OutgoingMessageRepository
+    val wireManageer: WireApplicationManager
 ) {
     @Transactional
     fun doWork(taskId: String) {

@@ -20,6 +20,7 @@ import com.wire.integrations.jvm.WireEventsHandler
 import com.wire.integrations.jvm.model.AssetResource
 import com.wire.integrations.jvm.model.WireMessage
 import com.wire.integrations.jvm.model.asset.AssetRetention
+import com.wire.integrations.jvm.service.WireApplicationManager
 import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
@@ -32,6 +33,12 @@ private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
 @ApplicationScoped
 @Startup
 class MlsSdkClient {
+
+    private lateinit var manager: WireApplicationManager
+    fun getManager(): WireApplicationManager {
+        return manager
+    }
+
     @PostConstruct
     fun init() {
         val wireAppSdk =
@@ -127,6 +134,7 @@ class MlsSdkClient {
         wireAppSdk.startListening()
         // Will keep a thread running in the background until explicitly stopped
         val applicationManager = wireAppSdk.getApplicationManager()
+        manager = applicationManager
 
         applicationManager.getStoredTeams().forEach {
             logger.info("Team: $it")
