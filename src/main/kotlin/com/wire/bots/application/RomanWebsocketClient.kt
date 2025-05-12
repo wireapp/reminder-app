@@ -17,6 +17,7 @@ import java.util.concurrent.Executors
 /*
 * Deprecated: This class is not used anymore. Use [MlsSdkClient] instead.
 */
+@Deprecated("This class is not used anymore", ReplaceWith("MlsSdkClient"))
 class RomanWebsocketClient(
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.url")
     private val baseUrl: String,
