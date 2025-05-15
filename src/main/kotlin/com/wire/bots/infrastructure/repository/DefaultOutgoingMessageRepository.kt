@@ -9,16 +9,16 @@ import com.wire.bots.infrastructure.toOutgoingMessage
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
-@ApplicationScoped
-class DefaultOutgoingMessageRepository(
-    @RestClient val conversationRemoteApi: ConversationRemoteApi
-) : OutgoingMessageRepository {
-    override fun sendMessage(
-        conversationId: PlainConversationId,
-        token: String,
-        messageContent: String
-    ): Either<Throwable, Unit> =
-        either {
-            conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
-        }
-}
+//@ApplicationScoped
+//class DefaultOutgoingMessageRepository(
+//    @RestClient val conversationRemoteApi: ConversationRemoteApi
+//) : OutgoingMessageRepository {
+//    override fun sendMessage(
+//        conversationId: PlainConversationId,
+//        token: String,
+//        messageContent: String
+//    ): Either<Throwable, Unit> =
+//        either {
+//            conversationRemoteApi.sendMessage(token, messageContent.toOutgoingMessage())
+//        }
+//}

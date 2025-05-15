@@ -7,6 +7,7 @@ import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.domain.reminder.ReminderNextSchedule
+import com.wire.bots.domain.usecase.DeleteReminderUseCase
 import com.wire.bots.domain.usecase.ListRemindersInConversation
 import com.wire.bots.domain.usecase.SaveReminderSchedule
 
@@ -14,7 +15,8 @@ import com.wire.bots.domain.usecase.SaveReminderSchedule
 class CommandHandler(
     private val outgoingMessageRepository: OutgoingMessageRepository,
     private val saveReminderSchedule: SaveReminderSchedule,
-    private val listRemindersInConversation: ListRemindersInConversation
+    private val listRemindersInConversation: ListRemindersInConversation,
+    private val deleteReminder: DeleteReminderUseCase,
 ) : EventHandler<Command> {
     override fun onEvent(event: Command): Either<Throwable, Unit> =
         when (event) {
@@ -34,6 +36,7 @@ class CommandHandler(
 
             is Command.NewReminder -> handleNewReminder(event)
             is Command.ListReminders -> getReminderListMessage(event)
+            is Command.DeleteReminder -> deleteReminder(event)
         }
 
     private fun getReminderListMessage(command: Command.ListReminders): Either<Throwable, Unit> =
@@ -58,6 +61,25 @@ class CommandHandler(
                 command.token,
                 getCreatedMessage(it)
             )
+        }
+    private fun deleteReminder(command: Command.DeleteReminder): Either<Throwable, Unit> =
+        listRemindersInConversation(command.conversationId).flatMap { reminders ->
+            val reminder = reminders.find { it.taskId == command.reminderId }
+            if (reminder != null) {
+                deleteReminder.invoke(reminder.taskId, reminder.conversationId).flatMap {
+                    outgoingMessageRepository.sendMessage(
+                        command.conversationId,
+                        command.token,
+                        "The reminder '${reminder.task}' was deleted."
+                    )
+                }
+            } else {
+                outgoingMessageRepository.sendMessage(
+                    command.conversationId,
+                    command.token,
+                    "The reminder with id '${command.reminderId}' was not found."
+                )
+            }
         }
 
     private fun getCreatedMessage(reminderNextSchedule: ReminderNextSchedule): String =

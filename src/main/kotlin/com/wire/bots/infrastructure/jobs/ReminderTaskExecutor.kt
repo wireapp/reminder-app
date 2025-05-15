@@ -17,16 +17,14 @@ class ReminderTaskExecutor(
     @Transactional
     fun doWork(taskId: String) {
         val reminder = reminderRepository.find("taskId", taskId).singleResult()
-        tokenRepository.getToken(reminder.conversationId).flatMap { token ->
-            outgoingMessageRepository.sendMessage(
-                reminder.conversationId,
-                token,
-                reminder.task
-            ).flatMap {
-                either {
-                    if (!reminder.isEternal) {
-                        reminderRepository.delete(reminder)
-                    }
+        outgoingMessageRepository.sendMessage(
+            reminder.conversationId,
+            "token",
+            reminder.task
+        ).flatMap {
+            either {
+                if (!reminder.isEternal) {
+                    reminderRepository.delete(reminder)
                 }
             }
         }
