@@ -34,7 +34,6 @@ class MlsSdkOutgoingMessageRepository(
                 text = messageContent,
             )
             manager?.sendMessage(
-                conversationId = qualifiedID,
                 message = message,
             )
         }

@@ -1,19 +1,21 @@
 package com.wire.bots.domain.usecase
 
 import arrow.core.Either
+import arrow.core.flatMap
 import com.wire.bots.domain.DomainComponent
 import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.reminder.ReminderRepository
+import com.wire.bots.domain.reminder.ReminderJobRepository
 
 /**
  * Delete reminder for a conversation.
  */
 @DomainComponent
 class DeleteReminderUseCase(
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
+    private val reminderJobRepository: ReminderJobRepository
 ) {
     operator fun invoke(reminderId: String, conversationId: PlainConversationId): Either<Throwable, Unit> =
-        Either.catch {
-            reminderRepository.deleteReminder(reminderId, conversationId)
-        }
+        reminderRepository.deleteReminder(reminderId, conversationId)
+            .flatMap { reminderJobRepository.cancelReminderJob(reminderId, conversationId) }
 }

@@ -21,7 +21,7 @@ import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.event.EventProcessor
 // import com.wire.bots.infrastructure.repository.MlsSdkOutgoingMessageRepository
 import com.wire.integrations.jvm.WireAppSdk
-import com.wire.integrations.jvm.WireEventsHandler
+import com.wire.integrations.jvm.WireEventsHandlerSuspending
 import com.wire.integrations.jvm.model.WireMessage
 import com.wire.integrations.jvm.service.WireApplicationManager
 import com.wire.integrations.jvm.utils.obfuscateId
@@ -44,7 +44,6 @@ private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
 @Startup
 class MlsSdkClient(
     private val eventProcessor: EventProcessor,
-//    private val mlsSdkOutgoingMessageRepository: MlsSdkOutgoingMessageRepository
 
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.bot-key")
     private val apiToken: String,
@@ -63,8 +62,8 @@ class MlsSdkClient(
                 apiToken = apiToken,
                 apiHost = apiHost,
                 cryptographyStoragePassword = "myDummyPassword",
-                object : WireEventsHandler() {
-                    override suspend fun onNewMessageSuspending(wireMessage: WireMessage.Text) {
+                object : WireEventsHandlerSuspending() {
+                    override suspend fun onMessage(wireMessage: WireMessage.Text) {
                         logger.info("Received Text Message: $wireMessage")
                         // Create an EventDTO from the WireMessage
                         val eventDTO = EventDTO(
@@ -79,30 +78,50 @@ class MlsSdkClient(
                         processEvent(eventDTO)
                     }
 
-                    override suspend fun onNewAssetSuspending(wireMessage: WireMessage.Asset) {
+                    override suspend fun onAsset(wireMessage: WireMessage.Asset) {
                         logger.info("Received Asset Message: $wireMessage")
                         // Assets are not handled by reminder bot
                     }
 
-                    override suspend fun onNewCompositeSuspending(
+                    override suspend fun onComposite(
                         wireMessage: WireMessage.Composite
                     ) {
                         logger.info("Received Composite Message: $wireMessage")
                         // Composite messages are not handled by reminder bot
                     }
 
-                    override suspend fun onNewButtonActionSuspending(
+                    override suspend fun onButtonAction(
                         wireMessage: WireMessage.ButtonAction
                     ) {
                         logger.info("Received ButtonAction Message: $wireMessage")
                         // Button actions are not handled by reminder bot
                     }
 
-                    override suspend fun onNewButtonActionConfirmationSuspending(
+                    override suspend fun onButtonActionConfirmation(
                         wireMessage: WireMessage.ButtonActionConfirmation
                     ) {
                         logger.info("Received ButtonActionConfirmation Message: $wireMessage")
                         // Button action confirmations are not handled by reminder bot
+                    }
+                    override suspend fun onKnock(wireMessage: WireMessage.Knock) {
+                        logger.info("Received onKnockSuspending Message : $wireMessage")
+
+                        val knock = WireMessage.Knock.create(
+                            conversationId = wireMessage.conversationId,
+                            hotKnock = true
+                        )
+
+                        manager.sendMessageSuspending(message = knock)
+                    }
+                    override suspend fun onLocation(wireMessage: WireMessage.Location) {
+                        logger.info("Received onLocationSuspending Message : $wireMessage")
+
+                        val message = WireMessage.Text.create(
+                            conversationId = wireMessage.conversationId,
+                            text = "Received Location\n\nLatitude: ${wireMessage.latitude}\n\nLongitude: ${wireMessage.longitude}\n\nName: ${wireMessage.name}\n\nZoom: ${wireMessage.zoom}"
+                        )
+
+                        manager.sendMessageSuspending(message = message)
                     }
                 }
             )
@@ -111,8 +130,6 @@ class MlsSdkClient(
         wireAppSdk.startListening()
         val applicationManager = wireAppSdk.getApplicationManager()
         manager = applicationManager
-//        // Give the application manager to our custom repository
-//        mlsSdkOutgoingMessageRepository.setApplicationManager(applicationManager)
 
         applicationManager.getStoredTeams().forEach {
             logger.info("Team: $it")

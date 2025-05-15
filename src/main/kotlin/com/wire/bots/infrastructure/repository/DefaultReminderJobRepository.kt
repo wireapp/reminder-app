@@ -32,6 +32,10 @@ class DefaultReminderJobRepository(
 
         return getNextReminderNextRun(reminder, trigger).right()
     }
+    override fun cancelReminderJob(reminderId: String, conversationId: String): Either<Throwable, Unit> =
+        Either.catch {
+            quartz.deleteJob(JobKey.jobKey(reminderId, conversationId))
+        }
 
     /**
      * Build the trigger for the reminder, simple trigger for single reminder and cron trigger for recurring reminder.
