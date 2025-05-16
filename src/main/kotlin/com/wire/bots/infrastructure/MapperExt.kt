@@ -35,7 +35,9 @@ fun ReminderEntity.toDomain(): Reminder {
             conversationId = this.conversationId,
             taskId = this.taskId,
             task = this.task,
-            scheduledCron = this.scheduledCron!!,
+            scheduledCron = this.scheduledCron ?: error(
+                "scheduledCron is null for RecurringReminder"
+            ),
             createdAt = this.createdAt
         )
 
@@ -44,7 +46,7 @@ fun ReminderEntity.toDomain(): Reminder {
                 conversationId = this.conversationId,
                 taskId = this.taskId,
                 task = this.task,
-                scheduledAt = this.scheduledAt!!,
+                scheduledAt = this.scheduledAt ?: error("scheduledAt is null for SingleReminder"),
                 createdAt = this.createdAt
             )
     }

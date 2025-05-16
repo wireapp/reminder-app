@@ -77,7 +77,7 @@ class RomanWebsocketClient(
                 eventProcessor.process(event)
             }
         )
-        return CompletableFuture<Void>()
+        return CompletableFuture<Unit>()
     }
 
     override fun onClose(
@@ -88,7 +88,7 @@ class RomanWebsocketClient(
         super.onClose(webSocket, statusCode, reason)
         logger.info("Websocket close: ${reason ?: "no reason"}, reopening...")
         init()
-        return CompletableFuture<Void>().also { it.complete(null) }
+        return CompletableFuture<Unit>().also { it.complete(null) }
     }
 
     override fun onError(

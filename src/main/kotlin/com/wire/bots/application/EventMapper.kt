@@ -19,7 +19,7 @@ object EventMapper {
                 EventTypeDTO.NEW_TEXT -> {
                     parseCommand(
                         conversationId = eventDTO.conversationId.orEmpty(),
-                        token = eventDTO.token!!,
+                        token = eventDTO.token ?: error("Token is null"),
                         rawCommand = eventDTO.text?.data.orEmpty()
                     )
                 }
@@ -35,7 +35,7 @@ object EventMapper {
                     Signal
                         .BotAdded(
                             conversationId = eventDTO.conversationId.orEmpty(),
-                            token = eventDTO.token!!
+                            token = eventDTO.token ?: error("Token is null")
                         ).right()
 
                 else -> BotError.Skip.left()
@@ -43,8 +43,8 @@ object EventMapper {
         }.getOrElse {
             BotError
                 .ReminderError(
-                    eventDTO.conversationId.orEmpty(),
-                    eventDTO.token.orEmpty(),
+                    conversationId = eventDTO.conversationId.orEmpty(),
+                    token = eventDTO.token.orEmpty(),
                     errorType = BotError.ErrorType.PARSE_ERROR
                 ).left()
         }
@@ -63,9 +63,9 @@ object EventMapper {
                 "/help" -> Command.LegacyHelp(conversationId, token).right()
                 "/remind" ->
                     parseCommandArgs(
-                        conversationId,
-                        token,
-                        rawCommand.substringAfter("/remind").trimStart()
+                        conversationId = conversationId,
+                        token = token,
+                        args = rawCommand.substringAfter("/remind").trimStart()
                     )
 
                 else -> BotError.Skip.left()
@@ -76,50 +76,78 @@ object EventMapper {
         conversationId: String,
         token: String,
         args: String
+    ): Either<BotError, Event> =
+        when {
+            args.trim() == "help" -> Command.Help(conversationId, token).right()
+            args.trim() == "list" -> Command.ListReminders(conversationId, token).right()
+            args.startsWith("to") -> parseToCommand(conversationId, token, args)
+            args.startsWith("delete") -> parseDeleteCommand(conversationId, token, args)
+            else ->
+                BotError
+                    .Unknown(
+                        conversationId = conversationId,
+                        token = token,
+                        reason = COMMAND_HINT
+                    ).left()
+        }
+
+    private fun parseToCommand(
+        conversationId: String,
+        token: String,
+        args: String
     ): Either<BotError, Event> {
-        return when {
-            args.trim() == "help" -> {
-                Command.Help(conversationId, token).right()
-            }
-
-            args.trim() == "list" -> {
-                Command.ListReminders(conversationId, token).right()
-            }
-
-            args.startsWith("to") -> {
-                val reminderArgs = args
-                    .substringAfter(
-                        "to"
-                    ).split('\"', '“')
-                    .filter { it.isNotBlank() }
-                return if (reminderArgs.size != 2) {
-                    BotError.Unknown(conversationId, token, COMMAND_HINT).left()
-                } else {
-                    val (task, schedule) = reminderArgs
-                    ReminderMapper
-                        .parseReminder(
-                            conversationId,
-                            token,
-                            task,
-                            schedule
-                        ).mapLeft { error ->
-                            when (error) {
-                                is BotError.ReminderError -> error
-                                else -> BotError.Unknown(conversationId, token, COMMAND_HINT)
-                            }
-                        }
+        val reminderArgs = args
+            .substringAfter("to")
+            .split('\"', '“')
+            .filter { it.isNotBlank() }
+        return if (reminderArgs.size != 2) {
+            BotError
+                .Unknown(
+                    conversationId = conversationId,
+                    token = token,
+                    reason = COMMAND_HINT
+                ).left()
+        } else {
+            val (task, schedule) = reminderArgs
+            ReminderMapper
+                .parseReminder(
+                    conversationId = conversationId,
+                    token = token,
+                    task = task,
+                    schedule = schedule
+                ).mapLeft { error ->
+                    when (error) {
+                        is BotError.ReminderError -> error
+                        else -> BotError.Unknown(
+                            conversationId = conversationId,
+                            token = token,
+                            reason = COMMAND_HINT
+                        )
+                    }
                 }
-            }
+        }
+    }
 
-            args.startsWith("delete") -> {
-                val reminderId = args.substringAfter("delete").trim()
-                return if (reminderId.isBlank()) {
-                    BotError.Unknown(conversationId, token, "Please provide a reminder ID to delete.").left()
-                } else {
-                    Command.DeleteReminder(conversationId, token, reminderId).right()
-                }
-            }
-            else -> BotError.Unknown(conversationId, token, COMMAND_HINT).left()
+    private fun parseDeleteCommand(
+        conversationId: String,
+        token: String,
+        args: String
+    ): Either<BotError, Event> {
+        val reminderId = args.substringAfter("delete").trim()
+        return if (reminderId.isBlank()) {
+            BotError
+                .Unknown(
+                    conversationId = conversationId,
+                    token = token,
+                    reason = "Please provide a reminder ID to delete."
+                ).left()
+        } else {
+            Command
+                .DeleteReminder(
+                    conversationId = conversationId,
+                    token = token,
+                    reminderId = reminderId
+                ).right()
         }
     }
 }

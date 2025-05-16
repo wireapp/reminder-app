@@ -11,5 +11,9 @@ interface ReminderRepository {
     fun getReminderOnConversationId(
         conversationId: PlainConversationId
     ): Either<Throwable, List<Reminder>>
-    fun deleteReminder(reminderId: String, conversationId: PlainConversationId): Either<Throwable, Unit>
+
+    fun deleteReminder(
+        reminderId: String,
+        conversationId: PlainConversationId
+    ): Either<Throwable, Unit>
 }

@@ -16,22 +16,22 @@ class CommandHandler(
     private val outgoingMessageRepository: OutgoingMessageRepository,
     private val saveReminderSchedule: SaveReminderSchedule,
     private val listRemindersInConversation: ListRemindersInConversation,
-    private val deleteReminder: DeleteReminderUseCase,
+    private val deleteReminder: DeleteReminderUseCase
 ) : EventHandler<Command> {
     override fun onEvent(event: Command): Either<Throwable, Unit> =
         when (event) {
             is Command.LegacyHelp ->
                 outgoingMessageRepository.sendMessage(
-                    event.conversationId,
-                    event.token,
-                    createLegacyHelpMessage()
+                    conversationId = event.conversationId,
+                    token = event.token,
+                    messageContent = createLegacyHelpMessage()
                 )
 
             is Command.Help ->
                 outgoingMessageRepository.sendMessage(
-                    event.conversationId,
-                    event.token,
-                    createHelpMessage()
+                    conversationId = event.conversationId,
+                    token = event.token,
+                    messageContent = createHelpMessage()
                 )
 
             is Command.NewReminder -> handleNewReminder(event)
@@ -51,33 +51,38 @@ class CommandHandler(
                         }
                 }
 
-            outgoingMessageRepository.sendMessage(command.conversationId, command.token, message)
+            outgoingMessageRepository.sendMessage(
+                conversationId = command.conversationId,
+                token = command.token,
+                messageContent = message
+            )
         }
 
     private fun handleNewReminder(command: Command.NewReminder): Either<Throwable, Unit> =
         saveReminderSchedule(command.reminder).flatMap {
             outgoingMessageRepository.sendMessage(
-                command.conversationId,
-                command.token,
-                getCreatedMessage(it)
+                conversationId = command.conversationId,
+                token = command.token,
+                messageContent = getCreatedMessage(it)
             )
         }
+
     private fun deleteReminder(command: Command.DeleteReminder): Either<Throwable, Unit> =
         listRemindersInConversation(command.conversationId).flatMap { reminders ->
             val reminder = reminders.find { it.taskId == command.reminderId }
             if (reminder != null) {
                 deleteReminder.invoke(reminder.taskId, reminder.conversationId).flatMap {
                     outgoingMessageRepository.sendMessage(
-                        command.conversationId,
-                        command.token,
-                        "The reminder '${reminder.task}' was deleted."
+                        conversationId = command.conversationId,
+                        token = command.token,
+                        messageContent = "The reminder '${reminder.task}' was deleted."
                     )
                 }
             } else {
                 outgoingMessageRepository.sendMessage(
-                    command.conversationId,
-                    command.token,
-                    "The reminder with id '${command.reminderId}' was not found."
+                    conversationId = command.conversationId,
+                    token = command.token,
+                    messageContent = "The reminder with id '${command.reminderId}' was not found."
                 )
             }
         }
@@ -85,15 +90,15 @@ class CommandHandler(
     private fun getCreatedMessage(reminderNextSchedule: ReminderNextSchedule): String =
         when (val reminder = reminderNextSchedule.reminder) {
             is Reminder.SingleReminder -> {
-                "I will remind you to '${reminder.task}' " +
-                    "at ${reminderNextSchedule.nextSchedules.first()}.\n" +
-                    "If you want to delete it, you can use the command " +
+                "I will remind you to **'${reminder.task}'** at:\n" +
+                    "**${reminderNextSchedule.nextSchedules.first()}**.\n" +
+                    "If you want to delete it, you can use the command:\n" +
                     "`/remind delete ${reminder.taskId}`"
             }
 
             is Reminder.RecurringReminder -> {
-                "I will periodically remind you to '${reminder.task}'.\n" +
-                    "If you want to delete it, you can use the command " +
+                "I will periodically remind you to **'${reminder.task}'**.\n" +
+                    "If you want to delete it, you can use the command:\n" +
                     "`/remind delete ${reminder.taskId}`\n\n" +
                     "The next ${reminderNextSchedule.nextSchedules.size} " +
                     "schedules for the reminder is:\n" +
@@ -117,22 +122,22 @@ class CommandHandler(
             
             1. You can start by creating a reminder with the following event, some valid examples are:
             
-            - **`/remind to "do something" "in 5 minutes"`**
-            - **`/remind to "do something" "today at 21:00"`**
-            - **`/remind to "do something" "18/09/2024 at 09:45"`**
-            - **`/remind to "do something" "next monday at 17:00"`**
+            `/remind to "do something" "in 5 minutes"`
+            `/remind to "do something" "today at 21:00"`
+            `/remind to "do something" "18/09/2024 at 09:45"`
+            `/remind to "do something" "next monday at 17:00"`
             
             You can also create a reminder that repeats, for example:
             
-            - **`/remind to "Start the daily stand up" "every day at 10:00"`**
+            `/remind to "Start the daily stand up" "every day at 10:00"`
             
             2. You can list all the active reminders in the conversation with the following event:
             
-            - **`/remind list`**
+            `/remind list`
             
             3. And you can delete a reminder with the following event:
             
-            - **`/remind delete <reminderId>`** (you can get the <reminderId> from the list event)
+            `/remind delete <reminderId>` (you can get the <reminderId> from the list event)
             """.trimIndent()
     }
 }

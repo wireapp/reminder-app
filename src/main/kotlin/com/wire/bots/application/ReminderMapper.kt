@@ -35,18 +35,29 @@ object ReminderMapper {
     ): Either<BotError, Event> =
         when {
             isRecurrentSchedule(schedule) && containsInvalidTimeTokens(schedule) -> {
-                BotError.ReminderError(
-                    conversationId,
-                    token,
-                    BotError.ErrorType.INCREMENT_IN_TIMEUNIT
-                ).left()
+                BotError
+                    .ReminderError(
+                        conversationId = conversationId,
+                        token = token,
+                        errorType = BotError.ErrorType.INCREMENT_IN_TIMEUNIT
+                    ).left()
             }
 
             VALID_RECURRENT_TOKENS.any { schedule.contains(it) } -> {
-                parseRecurrentTask(conversationId, token, task, schedule)
+                parseRecurrentTask(
+                    conversationId = conversationId,
+                    token = token,
+                    task = task,
+                    schedule = schedule
+                )
             }
 
-            else -> parseSingleTask(schedule, conversationId, token, task)
+            else -> parseSingleTask(
+                conversationId = conversationId,
+                token = token,
+                task = task,
+                schedule = schedule
+            )
         }
 
     private fun parseSingleTask(
@@ -56,20 +67,24 @@ object ReminderMapper {
         task: String
     ): Either<BotError.ReminderError, Command.NewReminder> {
         return runCatching {
-            val parsedSchedule = Chronic.parse(schedule, Options(Pointer.PointerType.FUTURE))
+            val parsedSchedule = Chronic.parse(
+                schedule,
+                Options(Pointer.PointerType.FUTURE)
+            )
             val parsedDate = parsedSchedule.beginCalendar.toInstant()
             if (parsedDate.isBefore(Instant.now())) {
-                return BotError.ReminderError(
-                    conversationId,
-                    token,
-                    BotError.ErrorType.DATE_IN_PAST
-                ).left()
+                return BotError
+                    .ReminderError(
+                        conversationId = conversationId,
+                        token = token,
+                        errorType = BotError.ErrorType.DATE_IN_PAST
+                    ).left()
             }
             Command
                 .NewReminder(
-                    conversationId,
-                    token,
-                    Reminder.SingleReminder(
+                    conversationId = conversationId,
+                    token = token,
+                    reminder = Reminder.SingleReminder(
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
                         task = task,
@@ -77,7 +92,12 @@ object ReminderMapper {
                     )
                 ).right()
         }.getOrElse {
-            BotError.ReminderError(conversationId, token, BotError.ErrorType.PARSE_ERROR).left()
+            BotError
+                .ReminderError(
+                    conversationId = conversationId,
+                    token = token,
+                    errorType = BotError.ErrorType.PARSE_ERROR
+                ).left()
         }
     }
 
@@ -90,9 +110,9 @@ object ReminderMapper {
         runCatching {
             Command
                 .NewReminder(
-                    conversationId,
-                    token,
-                    Reminder.RecurringReminder(
+                    conversationId = conversationId,
+                    token = token,
+                    reminder = Reminder.RecurringReminder(
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
                         task = task,
@@ -100,6 +120,11 @@ object ReminderMapper {
                     )
                 ).right()
         }.getOrElse {
-            BotError.ReminderError(conversationId, token, BotError.ErrorType.PARSE_ERROR).left()
+            BotError
+                .ReminderError(
+                    conversationId = conversationId,
+                    token = token,
+                    errorType = BotError.ErrorType.PARSE_ERROR
+                ).left()
         }
 }

@@ -15,7 +15,11 @@ class DeleteReminderUseCase(
     private val reminderRepository: ReminderRepository,
     private val reminderJobRepository: ReminderJobRepository
 ) {
-    operator fun invoke(reminderId: String, conversationId: PlainConversationId): Either<Throwable, Unit> =
-        reminderRepository.deleteReminder(reminderId, conversationId)
+    operator fun invoke(
+        reminderId: String,
+        conversationId: PlainConversationId
+    ): Either<Throwable, Unit> =
+        reminderRepository
+            .deleteReminder(reminderId, conversationId)
             .flatMap { reminderJobRepository.cancelReminderJob(reminderId, conversationId) }
 }

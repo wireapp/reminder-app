@@ -44,6 +44,7 @@ sealed class Command(
         override val conversationId: PlainConversationId,
         override val token: String
     ) : Command(conversationId, token)
+
     /**
      * Delete reminder event, for the target conversation.
      */

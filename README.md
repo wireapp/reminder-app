@@ -1,5 +1,12 @@
 # Wire Remind-App (ex. Reminders-Bot)
-### Is migrating from Roman to MLS with WireSDK. Act as an Echo bot at the moment.
+- ### Is migrating from Roman to MLS with WireSDK.
+- ### Reminder features recovered.
+- ### TODO: Code need to be cleaned and refactored.
+
+### Latest features update:
+- The bot handles pings and responds with a usage cheat sheet.
+
+> This is on development and not ready for production use.
 
 This is an app that can create reminders for you and your group, and send you a message when the reminder is due.
 

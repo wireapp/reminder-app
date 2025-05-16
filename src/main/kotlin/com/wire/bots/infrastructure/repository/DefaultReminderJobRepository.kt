@@ -32,7 +32,11 @@ class DefaultReminderJobRepository(
 
         return getNextReminderNextRun(reminder, trigger).right()
     }
-    override fun cancelReminderJob(reminderId: String, conversationId: String): Either<Throwable, Unit> =
+
+    override fun cancelReminderJob(
+        reminderId: String,
+        conversationId: String
+    ): Either<Throwable, Unit> =
         Either.catch {
             quartz.deleteJob(JobKey.jobKey(reminderId, conversationId))
         }
@@ -49,12 +53,10 @@ class DefaultReminderJobRepository(
                     .withIdentity(
                         "mySingleTriggerFor_${reminder.taskId}",
                         reminder.conversationId
-                    )
-                    .startAt(Date.from(reminder.scheduledAt.minusSeconds(SECONDS_BEFORE_WARMUP)))
+                    ).startAt(Date.from(reminder.scheduledAt.minusSeconds(SECONDS_BEFORE_WARMUP)))
                     .withSchedule(
                         SimpleScheduleBuilder.repeatSecondlyForTotalCount(SINGLE_TIME_COUNT_JOB)
-                    )
-                    .build()
+                    ).build()
             }
 
             is Reminder.RecurringReminder -> {
@@ -63,8 +65,7 @@ class DefaultReminderJobRepository(
                     .withIdentity(
                         "myRecurringTriggerFor_${reminder.taskId}",
                         reminder.conversationId
-                    )
-                    .startNow()
+                    ).startNow()
                     .withSchedule(CronScheduleBuilder.cronSchedule(reminder.scheduledCron))
                     .build()
             }

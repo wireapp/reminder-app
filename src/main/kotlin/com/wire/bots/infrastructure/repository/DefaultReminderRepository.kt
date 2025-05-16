@@ -33,9 +33,17 @@ class DefaultReminderRepository :
         Either.catch {
             list("conversationId", conversationId).map { it.toDomain() }
         }
+
     @Transactional
-    override fun deleteReminder(reminderId: String, conversationId: PlainConversationId): Either<Throwable, Unit> =
+    override fun deleteReminder(
+        reminderId: String,
+        conversationId: PlainConversationId
+    ): Either<Throwable, Unit> =
         Either.catch {
-            delete("taskId = ?1 and conversationId = ?2", reminderId, conversationId)
+            delete(
+                "taskId = ?1 and conversationId = ?2",
+                reminderId,
+                conversationId
+            )
         }
 }
