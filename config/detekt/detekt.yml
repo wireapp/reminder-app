@@ -140,8 +140,8 @@ complexity:
     active: false
     threshold: 6
   NamedArguments:
-    active: false
-    threshold: 3
+    active: true
+    threshold: 2
     ignoreArgumentsMatchingNames: false
   NestedBlockDepth:
     active: true
@@ -673,7 +673,7 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 2
+    max: 3
     excludedFunctions:
       - 'equals'
     excludeLabeled: false

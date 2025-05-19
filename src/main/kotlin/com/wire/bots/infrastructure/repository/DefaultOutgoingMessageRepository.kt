@@ -6,10 +6,9 @@ import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.infrastructure.client.ConversationRemoteApi
 import com.wire.bots.infrastructure.toOutgoingMessage
-import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
-@ApplicationScoped
+@Deprecated("This class is not used anymore", ReplaceWith("MlsSdkOutgoingMessageRepository"))
 class DefaultOutgoingMessageRepository(
     @RestClient val conversationRemoteApi: ConversationRemoteApi
 ) : OutgoingMessageRepository {

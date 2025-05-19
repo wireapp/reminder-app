@@ -15,132 +15,145 @@
 
 package com.wire.bots.application
 
+import arrow.core.Either
+import com.wire.bots.domain.event.BotError
+import com.wire.bots.domain.event.Event
+import com.wire.bots.domain.event.EventProcessor
 import com.wire.integrations.jvm.WireAppSdk
-import com.wire.integrations.jvm.WireEventsHandler
-import com.wire.integrations.jvm.model.AssetResource
+import com.wire.integrations.jvm.WireEventsHandlerSuspending
 import com.wire.integrations.jvm.model.WireMessage
-import com.wire.integrations.jvm.model.asset.AssetRetention
+import com.wire.integrations.jvm.service.WireApplicationManager
 import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.util.UUID
 
 private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
 
-/*
-* EchoBot is used only to demonstrate the usage of the Wire Apps SDK with Quarkus.
-* It will echo back the messages sent to it and used only for testing purposes.
-* It will be replaced with MlsSdkClient implementation in the future.
+/**
+ * MlsSdkClient is the entry point for Wire Apps SDK integration.
+ * It handles the connection to Wire backend and processes messages using reminder logic.
  */
 @ApplicationScoped
 @Startup
-class MlsSdkClient {
+class MlsSdkClient(
+    private val eventProcessor: EventProcessor,
+    @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.bot-key")
+    private val apiToken: String,
+    @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.url")
+    private val apiHost: String
+) {
+    private lateinit var manager: WireApplicationManager
+
+    fun getManager(): WireApplicationManager = manager
+
     @PostConstruct
     fun init() {
         val wireAppSdk =
             WireAppSdk(
                 applicationId = UUID.randomUUID(),
-                apiToken = "myApiToken",
-                apiHost = "https://nginz-https.chala.wire.link",
+                apiToken = apiToken,
+                apiHost = apiHost,
                 cryptographyStoragePassword = "myDummyPassword",
-                object : WireEventsHandler() {
-                    override suspend fun onNewMessageSuspending(wireMessage: WireMessage.Text) {
-                        logger.info("Received Text Message : $wireMessage")
+                wireEventsHandler = object : WireEventsHandlerSuspending() {
+                    override suspend fun onMessage(wireMessage: WireMessage.Text) {
+                        logger.info(
+                            "Received Text Message from conversation: " +
+                                "${wireMessage.conversationId}"
+                        )
+                        val eventDTO = createEventDTOFromWireMessage(wireMessage)
+                        processEvent(eventDTO)
+                    }
 
-                        if (wireMessage.text?.contains("asset") ?: false) {
-                            val resourcePath =
-                                javaClass.classLoader.getResource("banana-icon.png")?.path
-                                    ?: error("Test resource 'banana-icon.png' not found")
-                            val originalData = File(resourcePath).readBytes()
-
-                            manager.uploadAndSendMessageSuspending(
-                                conversationId = wireMessage.conversationId,
-                                asset = AssetResource(originalData),
-                                mimeType = "image/png",
-                                retention = AssetRetention.VOLATILE
-                            )
-                            return
-                        }
-
-                        val message =
-                            WireMessage.Text.create(
-                                conversationId = wireMessage.conversationId,
-                                text = "${wireMessage.text} -- Sent from the SDK"
-                            )
-
-                        manager.sendMessageSuspending(
-                            conversationId = wireMessage.conversationId,
-                            message = message
+                    private fun createEventDTOFromWireMessage(
+                        wireMessage: WireMessage.Text
+                    ): EventDTO {
+                        val textId = wireMessage.conversationId.id
+                        val textDomain = wireMessage.conversationId.domain
+                        val textQualifiedId = "$textId@$textDomain"
+                        return EventDTO(
+                            type = EventTypeDTO.NEW_TEXT,
+                            botId = "",
+                            userId = wireMessage.sender?.id?.toString().orEmpty(),
+                            token = wireMessage.conversationId.toString(),
+                            conversationId = textQualifiedId,
+                            text = wireMessage.text?.let { TextContent(it) }
                         )
                     }
 
-                    override suspend fun onNewAssetSuspending(wireMessage: WireMessage.Asset) {
-                        logger.info("Received Asset Message : $wireMessage")
-
-                        val message =
-                            WireMessage.Text.create(
-                                conversationId = wireMessage.conversationId,
-                                text = "Received Asset : ${wireMessage.name}"
-                            )
-
-                        manager.sendMessageSuspending(
-                            conversationId = wireMessage.conversationId,
-                            message = message
-                        )
-
-                        wireMessage.remoteData?.let { remoteData ->
-                            val asset = manager.downloadAssetSuspending(remoteData)
-                            val fileName = wireMessage.name ?: "unknown-${UUID.randomUUID()}"
-                            val outputDir = File("build/downloaded_assets").apply { mkdirs() }
-                            val outputFile = File(outputDir, fileName)
-                            outputFile.writeBytes(asset.value)
-                            logger.info(
-                                "Downloaded asset with size: ${asset.value.size} bytes," +
-                                    " saved to: ${outputFile.absolutePath}"
-                            )
-                        }
+                    override suspend fun onAsset(wireMessage: WireMessage.Asset) {
+                        logger.info("Received Asset Message: $wireMessage")
+                        // Assets are not handled by reminder bot
                     }
 
-                    override suspend fun onNewCompositeSuspending(
-                        wireMessage: WireMessage.Composite
-                    ) {
-                        logger.info("Received Composite Message : $wireMessage")
-
-                        logger.info("Received Composite Items:")
-                        wireMessage.items.forEach {
-                            logger.info("Composite Item: $it")
-                        }
+                    override suspend fun onComposite(wireMessage: WireMessage.Composite) {
+                        logger.info("Received Composite Message: $wireMessage")
+                        // Composite messages are not handled by reminder bot
                     }
 
-                    override suspend fun onNewButtonActionSuspending(
-                        wireMessage: WireMessage.ButtonAction
-                    ) {
-                        logger.info("Received ButtonAction Message : $wireMessage")
+                    override suspend fun onButtonAction(wireMessage: WireMessage.ButtonAction) {
+                        logger.info("Received ButtonAction Message: $wireMessage")
+                        // Button actions are not handled by reminder bot
                     }
 
-                    override suspend fun onNewButtonActionConfirmationSuspending(
+                    override suspend fun onButtonActionConfirmation(
                         wireMessage: WireMessage.ButtonActionConfirmation
                     ) {
-                        logger.info("Received ButtonActionConfirmation Message : $wireMessage")
+                        logger.info("Received ButtonActionConfirmation Message: $wireMessage")
+                        // Button action confirmations are not handled by reminder bot
+                    }
+
+                    override suspend fun onKnock(wireMessage: WireMessage.Knock) {
+                        logger.info("Received onKnockSuspending Message : $wireMessage")
+                        // Button knocks/pings are not handled by reminder bot
+                    }
+
+                    override suspend fun onLocation(wireMessage: WireMessage.Location) {
+                        logger.info("Received onLocationSuspending Message : $wireMessage")
+
+                        val message = WireMessage.Text.create(
+                            conversationId = wireMessage.conversationId,
+                            text = "Received Location\n\n" +
+                                "Latitude: ${wireMessage.latitude}\n\n" +
+                                "Longitude: ${wireMessage.longitude}\n\n" +
+                                "Name: ${wireMessage.name}\n\n" +
+                                "Zoom: ${wireMessage.zoom}"
+                        )
+
+                        manager.sendMessageSuspending(message = message)
                     }
                 }
             )
 
         logger.info("Starting Wire Apps SDK...")
         wireAppSdk.startListening()
-        // Will keep a thread running in the background until explicitly stopped
         val applicationManager = wireAppSdk.getApplicationManager()
-
-        applicationManager.getStoredTeams().forEach {
-            logger.info("Team: $it")
-        }
-        applicationManager.getStoredConversations().forEach {
-            logger.info("Conversation: $it")
-        }
-        logger.info("Wire backend domain: ${applicationManager.getBackendConfiguration().domain}")
-
+        manager = applicationManager
+        logger.info("Wire Apps SDK started successfully.")
         // Use wireAppSdk.stop() to stop the SDK or just stop it with Ctrl+C/Cmd+C
+    }
+
+    /**
+     * Process an event using the reminder bot logic
+     */
+    private fun processEvent(eventDTO: EventDTO) {
+        try {
+            logger.debug("Processing event: $eventDTO")
+            val eventResult: Either<BotError, Event> = EventMapper.fromEvent(eventDTO)
+            eventResult.fold(
+                ifLeft = { error ->
+                    logger.warn("Processing event with error: $error")
+                    eventProcessor.process(error)
+                },
+                ifRight = { event ->
+                    logger.info("Processing event parsed to: $event")
+                    eventProcessor.process(event)
+                }
+            )
+        } catch (e: IllegalArgumentException) {
+            logger.error("Error processing event", e)
+        }
     }
 }

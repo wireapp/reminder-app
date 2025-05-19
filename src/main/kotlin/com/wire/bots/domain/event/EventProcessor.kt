@@ -60,8 +60,8 @@ class EventProcessor(
 
     private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> =
         outgoingMessageRepository.sendMessage(
-            error.conversationId,
-            error.token,
-            error.reason
+            conversationId = error.conversationId,
+            token = error.token,
+            messageContent = error.reason
         )
 }
