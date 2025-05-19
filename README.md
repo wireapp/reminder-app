@@ -4,8 +4,7 @@
 - ### TODO: Code need to be cleaned and refactored.
 
 ### Latest features update:
-- The bot handles pings and responds with a usage cheat sheet.
-
+- You can delete reminder with `/remind delete <reminder-identifier>` command.
 > This is on development and not ready for production use.
 
 This is an app that can create reminders for you and your group, and send you a message when the reminder is due.

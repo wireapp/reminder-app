@@ -19,8 +19,6 @@ import arrow.core.Either
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.event.EventProcessor
-import com.wire.bots.domain.event.handlers.CommandHandler.Companion.createHelpMessage
-// import com.wire.bots.infrastructure.repository.MlsSdkOutgoingMessageRepository
 import com.wire.integrations.jvm.WireAppSdk
 import com.wire.integrations.jvm.WireEventsHandlerSuspending
 import com.wire.integrations.jvm.model.WireMessage
@@ -28,7 +26,6 @@ import com.wire.integrations.jvm.service.WireApplicationManager
 import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.enterprise.inject.Produces
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -39,7 +36,6 @@ private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
  * MlsSdkClient is the entry point for Wire Apps SDK integration.
  * It handles the connection to Wire backend and processes messages using reminder logic.
  */
-
 @ApplicationScoped
 @Startup
 class MlsSdkClient(
@@ -49,9 +45,9 @@ class MlsSdkClient(
     @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.url")
     private val apiHost: String
 ) {
-    private var manager: WireApplicationManager? = null
+    private lateinit var manager: WireApplicationManager
 
-    fun getManager(): WireApplicationManager? = manager
+    fun getManager(): WireApplicationManager = manager
 
     @PostConstruct
     fun init() {
@@ -111,13 +107,7 @@ class MlsSdkClient(
 
                     override suspend fun onKnock(wireMessage: WireMessage.Knock) {
                         logger.info("Received onKnockSuspending Message : $wireMessage")
-
-                        // Send a help message when a knock/ping is received
-                        val helpMessage = WireMessage.Text.create(
-                            conversationId = wireMessage.conversationId,
-                            text = createHelpMessage()
-                        )
-                        manager.sendMessageSuspending(message = helpMessage)
+                        // Button knocks/pings are not handled by reminder bot
                     }
 
                     override suspend fun onLocation(wireMessage: WireMessage.Location) {
@@ -166,9 +156,4 @@ class MlsSdkClient(
             logger.error("Error processing event", e)
         }
     }
-
-    @Produces
-    @ApplicationScoped
-    fun provideApplicationManager(): WireApplicationManager =
-        manager ?: error("Manager not initialized yet")
 }

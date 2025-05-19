@@ -67,6 +67,7 @@ class CommandHandler(
             )
         }
 
+    // TODO: add function to retrive single reminder by id
     private fun deleteReminder(command: Command.DeleteReminder): Either<Throwable, Unit> =
         listRemindersInConversation(command.conversationId).flatMap { reminders ->
             val reminder = reminders.find { it.taskId == command.reminderId }
