@@ -19,24 +19,17 @@ object EventMapper {
                 EventTypeDTO.NEW_TEXT -> {
                     parseCommand(
                         conversationId = eventDTO.conversationId.orEmpty(),
-                        token = eventDTO.token ?: error("Token is null"),
                         rawCommand = eventDTO.text?.data.orEmpty()
                     )
                 }
 
                 EventTypeDTO.BOT_REMOVED ->
                     Signal
-                        .BotRemoved(
-                            conversationId = eventDTO.conversationId.orEmpty(),
-                            token = eventDTO.token.orEmpty()
-                        ).right()
+                        .BotRemoved(eventDTO.conversationId.orEmpty()).right()
 
                 EventTypeDTO.BOT_REQUEST ->
                     Signal
-                        .BotAdded(
-                            conversationId = eventDTO.conversationId.orEmpty(),
-                            token = eventDTO.token ?: error("Token is null")
-                        ).right()
+                        .BotAdded(eventDTO.conversationId.orEmpty()).right()
 
                 else -> BotError.Skip.left()
             }
@@ -44,7 +37,6 @@ object EventMapper {
             BotError
                 .ReminderError(
                     conversationId = eventDTO.conversationId.orEmpty(),
-                    token = eventDTO.token.orEmpty(),
                     errorType = BotError.ErrorType.PARSE_ERROR
                 ).left()
         }
@@ -54,17 +46,15 @@ object EventMapper {
      */
     private fun parseCommand(
         conversationId: String,
-        token: String,
         rawCommand: String
     ): Either<BotError, Event> =
         either {
             val words = rawCommand.split(COMMAND_EXPRESSION)
             return when (words[0]) {
-                "/help" -> Command.LegacyHelp(conversationId, token).right()
+                "/help" -> Command.LegacyHelp(conversationId).right()
                 "/remind" ->
                     parseCommandArgs(
                         conversationId = conversationId,
-                        token = token,
                         args = rawCommand.substringAfter("/remind").trimStart()
                     )
 
@@ -74,26 +64,23 @@ object EventMapper {
 
     private fun parseCommandArgs(
         conversationId: String,
-        token: String,
         args: String
     ): Either<BotError, Event> =
         when {
-            args.trim() == "help" -> Command.Help(conversationId, token).right()
-            args.trim() == "list" -> Command.ListReminders(conversationId, token).right()
-            args.startsWith("to") -> parseToCommand(conversationId, token, args)
-            args.startsWith("delete") -> parseDeleteCommand(conversationId, token, args)
+            args.trim() == "help" -> Command.Help(conversationId).right()
+            args.trim() == "list" -> Command.ListReminders(conversationId).right()
+            args.startsWith("to") -> parseToCommand(conversationId, args)
+            args.startsWith("delete") -> parseDeleteCommand(conversationId, args)
             else ->
                 BotError
                     .Unknown(
                         conversationId = conversationId,
-                        token = token,
                         reason = COMMAND_HINT
                     ).left()
         }
 
     private fun parseToCommand(
         conversationId: String,
-        token: String,
         args: String
     ): Either<BotError, Event> {
         val reminderArgs = args
@@ -104,7 +91,6 @@ object EventMapper {
             BotError
                 .Unknown(
                     conversationId = conversationId,
-                    token = token,
                     reason = COMMAND_HINT
                 ).left()
         } else {
@@ -112,7 +98,6 @@ object EventMapper {
             ReminderMapper
                 .parseReminder(
                     conversationId = conversationId,
-                    token = token,
                     task = task,
                     schedule = schedule
                 ).mapLeft { error ->
@@ -120,7 +105,6 @@ object EventMapper {
                         is BotError.ReminderError -> error
                         else -> BotError.Unknown(
                             conversationId = conversationId,
-                            token = token,
                             reason = COMMAND_HINT
                         )
                     }
@@ -130,7 +114,6 @@ object EventMapper {
 
     private fun parseDeleteCommand(
         conversationId: String,
-        token: String,
         args: String
     ): Either<BotError, Event> {
         val reminderId = args.substringAfter("delete").trim()
@@ -138,14 +121,12 @@ object EventMapper {
             BotError
                 .Unknown(
                     conversationId = conversationId,
-                    token = token,
                     reason = "Please provide a reminder ID to delete."
                 ).left()
         } else {
             Command
                 .DeleteReminder(
                     conversationId = conversationId,
-                    token = token,
                     reminderId = reminderId
                 ).right()
         }

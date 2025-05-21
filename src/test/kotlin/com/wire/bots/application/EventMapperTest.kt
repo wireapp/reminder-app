@@ -19,7 +19,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent("not relevant")
             )
 
@@ -39,8 +38,7 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.BOT_REQUEST,
                 conversationId = "conversationId",
-                botId = "botId",
-                token = "token"
+                botId = "botId"
             )
 
         // when
@@ -48,7 +46,7 @@ class EventMapperTest {
 
         // then
         event.shouldSucceed {
-            assertEquals(Signal.BotAdded("conversationId", "token"), it)
+            assertEquals(Signal.BotAdded("conversationId"), it)
         }
     }
 
@@ -67,7 +65,7 @@ class EventMapperTest {
 
         // then
         event.shouldSucceed {
-            assertEquals(Signal.BotRemoved("conversationId", ""), it)
+            assertEquals(Signal.BotRemoved("conversationId"), it)
         }
     }
 
@@ -79,7 +77,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent("/help")
             )
 
@@ -88,7 +85,7 @@ class EventMapperTest {
 
         // then
         event.shouldSucceed {
-            assertEquals(Command.LegacyHelp("conversationId", "token"), it)
+            assertEquals(Command.LegacyHelp("conversationId"), it)
         }
     }
 
@@ -100,7 +97,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent("/remind help")
             )
 
@@ -109,7 +105,7 @@ class EventMapperTest {
 
         // then
         event.shouldSucceed {
-            assertEquals(Command.Help("conversationId", "token"), it)
+            assertEquals(Command.Help("conversationId"), it)
         }
     }
 
@@ -121,7 +117,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent(
                     """/remind to "join the refinement session" "tomorrow at 11:00"""".trimIndent()
                 )
@@ -150,7 +145,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent(
                     """/remind to "join the daily stand up" "every monday at 10:00"""".trimIndent()
                 )
@@ -179,7 +173,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent(
                     """/remind to "drink water" "every 1 hours"""".trimIndent()
                 )
@@ -206,7 +199,6 @@ class EventMapperTest {
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = "conversationId",
                 botId = "botId",
-                token = "token",
                 text = TextContent("""/remind to "drink water" "yesterday" """.trimIndent())
             )
 

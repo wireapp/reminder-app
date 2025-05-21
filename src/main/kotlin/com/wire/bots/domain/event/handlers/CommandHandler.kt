@@ -23,14 +23,12 @@ class CommandHandler(
             is Command.LegacyHelp ->
                 outgoingMessageRepository.sendMessage(
                     conversationId = event.conversationId,
-                    token = event.token,
                     messageContent = createLegacyHelpMessage()
                 )
 
             is Command.Help ->
                 outgoingMessageRepository.sendMessage(
                     conversationId = event.conversationId,
-                    token = event.token,
                     messageContent = createHelpMessage()
                 )
 
@@ -53,7 +51,6 @@ class CommandHandler(
 
             outgoingMessageRepository.sendMessage(
                 conversationId = command.conversationId,
-                token = command.token,
                 messageContent = message
             )
         }
@@ -62,7 +59,6 @@ class CommandHandler(
         saveReminderSchedule(command.reminder).flatMap {
             outgoingMessageRepository.sendMessage(
                 conversationId = command.conversationId,
-                token = command.token,
                 messageContent = getCreatedMessage(it)
             )
         }
@@ -75,14 +71,12 @@ class CommandHandler(
                 deleteReminder.invoke(reminder.taskId, reminder.conversationId).flatMap {
                     outgoingMessageRepository.sendMessage(
                         conversationId = command.conversationId,
-                        token = command.token,
                         messageContent = "The reminder '${reminder.task}' was deleted."
                     )
                 }
             } else {
                 outgoingMessageRepository.sendMessage(
                     conversationId = command.conversationId,
-                    token = command.token,
                     messageContent = "The reminder with id '${command.reminderId}' was not found."
                 )
             }

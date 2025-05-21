@@ -10,7 +10,7 @@ class ReminderMapperTest {
     @Test
     fun givenASchedule_whenIsRecurringByTimeIncrement_ThenRaiseError() {
         // given - when
-        val result = ReminderMapper.parseReminder("conversationId", "token", "task", "every hour")
+        val result = ReminderMapper.parseReminder("conversationId", "task", "every hour")
 
         // then
         result.shouldFail {
@@ -27,7 +27,6 @@ class ReminderMapperTest {
         // given - when
         val result = ReminderMapper.parseReminder(
             "conversationId",
-            "token",
             "task",
             "on 1990-01-01"
         )
@@ -47,7 +46,6 @@ class ReminderMapperTest {
         // given - when
         val result = ReminderMapper.parseReminder(
             "conversationId",
-            "token",
             "task",
             "SOME INVALID SCHEDULE"
         )
@@ -67,7 +65,6 @@ class ReminderMapperTest {
         // given - when
         val result = ReminderMapper.parseReminder(
             "conversationId",
-            "token",
             "task",
             "not/valid/expression"
         )

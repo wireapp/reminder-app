@@ -77,7 +77,6 @@ class MlsSdkClient(
                             type = EventTypeDTO.NEW_TEXT,
                             botId = "",
                             userId = wireMessage.sender?.id?.toString().orEmpty(),
-                            token = wireMessage.conversationId.toString(),
                             conversationId = textQualifiedId,
                             text = wireMessage.text?.let { TextContent(it) }
                         )

@@ -6,7 +6,6 @@ import com.wire.bots.domain.PlainConversationId
 interface OutgoingMessageRepository {
     fun sendMessage(
         conversationId: PlainConversationId,
-        token: String,
         messageContent: String
     ): Either<Throwable, Unit>
 }

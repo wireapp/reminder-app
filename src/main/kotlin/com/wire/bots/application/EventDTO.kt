@@ -8,7 +8,6 @@ data class EventDTO(
     val type: EventTypeDTO,
     val botId: String,
     val userId: String? = null,
-    val token: String? = null,
     val conversationId: String? = null,
     val text: TextContent? = null,
     val handle: String? = null,

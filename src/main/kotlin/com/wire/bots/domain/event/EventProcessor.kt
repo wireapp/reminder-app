@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.right
 import com.wire.bots.domain.DomainComponent
 import com.wire.bots.domain.event.handlers.CommandHandler
-import com.wire.bots.domain.event.handlers.SignalHandler
+//import com.wire.bots.domain.event.handlers.SignalHandler
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.domain.usecase.SaveReminderSchedule
 import org.slf4j.LoggerFactory
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 @DomainComponent
 class EventProcessor(
     val commandHandler: CommandHandler,
-    val signalHandler: SignalHandler,
+//    val signalHandler: SignalHandler,
     val outgoingMessageRepository: OutgoingMessageRepository
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -26,12 +26,14 @@ class EventProcessor(
     fun process(event: Event): Either<Throwable, Unit> =
         when (event) {
             is Command -> commandHandler.onEvent(event)
-            is Signal -> signalHandler.onEvent(event)
+//            is Signal -> signalHandler.onEvent(event)
+            else -> Either.Left(
+                IllegalArgumentException("Unhandled event type: ${event::class.simpleName}")
+            )
         }.mapLeft { unhandled ->
             logger.error("Error processing event: $event", unhandled)
             outgoingMessageRepository.sendMessage(
                 conversationId = event.conversationId,
-                token = event.token,
                 messageContent = getErrorMessage(unhandled)
             )
             unhandled
@@ -61,7 +63,6 @@ class EventProcessor(
     private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> =
         outgoingMessageRepository.sendMessage(
             conversationId = error.conversationId,
-            token = error.token,
             messageContent = error.reason
         )
 }

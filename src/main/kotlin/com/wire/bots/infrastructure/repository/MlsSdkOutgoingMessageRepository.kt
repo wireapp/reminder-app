@@ -16,7 +16,6 @@ class MlsSdkOutgoingMessageRepository(
 ) : OutgoingMessageRepository {
     override fun sendMessage(
         conversationId: PlainConversationId,
-        token: String,
         messageContent: String
     ): Either<Throwable, Unit> =
         either {
