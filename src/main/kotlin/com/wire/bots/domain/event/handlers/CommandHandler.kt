@@ -36,6 +36,37 @@ class CommandHandler(
             is Command.ListReminders -> getReminderListMessage(event)
             is Command.DeleteReminder -> deleteReminder(event)
         }
+    private fun interpretCron(cron: String): String {
+        // Very basic cron parser: "second minute hour day month weekday"
+        val parts = cron.trim().split("\\s+".toRegex())
+        if (parts.size < 6) return "(invalid cron)"
+
+        return when {
+            parts[0] == "*" && parts[1] == "*" && parts[2] == "*" && parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
+                "every second"
+
+            parts[1] == "*" && parts[2] == "*" && parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
+                "every minute"
+
+            parts[2] == "*" && parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
+                "every hour"
+
+            // Recognize "every day at HH:mm" for "0 0 10 ? * *"
+            (parts[0] == "0" && parts[1] == "0" && parts[3] == "?" && parts[4] == "*" && parts[5] == "*") ->
+                "every day at ${parts[2].padStart(2, '0')}:00"
+
+            parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
+                "every day at ${parts[2]}:${parts[1].padStart(2, '0')}"
+
+            parts[4] == "*" && parts[5] == "*" ->
+                "every month on day ${parts[3]} at ${parts[2]}:${parts[1].padStart(2, '0')}"
+
+            parts[5] != "*" ->
+                "every week on ${parts[5]} at ${parts[2]}:${parts[1].padStart(2, '0')}"
+
+            else -> "every (custom cron: $cron)"
+        }
+    }
 
     private fun getReminderListMessage(command: Command.ListReminders): Either<Throwable, Unit> =
         listRemindersInConversation(command.conversationId).flatMap { reminders ->
@@ -45,7 +76,12 @@ class CommandHandler(
                 } else {
                     "The reminders in this conversation:\n" +
                         reminders.joinToString("\n") {
-                            "- What? ${it.task} (**${it.taskId}**)"
+                            "What: '${it.task}' at: ${
+                                when (it) {
+                                    is Reminder.SingleReminder -> it.scheduledAt
+                                    is Reminder.RecurringReminder -> interpretCron(it.scheduledCron)
+                                }
+                            } (`${it.taskId}`)"
                         }
                 }
 
@@ -106,13 +142,13 @@ class CommandHandler(
     companion object {
         fun createLegacyHelpMessage(): String =
             """
-            Hi, I'm the Reminders bot.
+            Hi, I'm the Remind App.
             Please use my specific help event **`/remind help`** to get more information about how to use me.
             """.trimIndent()
 
         fun createHelpMessage(): String =
             """
-            Hi, I'm the Reminders bot.
+            Hi, I'm the Remind App.
             I can help you to create reminders for your conversations, or yourself.
             
             1. You can start by creating a reminder with the following event, some valid examples are:

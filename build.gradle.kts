@@ -25,8 +25,8 @@ val quarkusPlatformVersion: String by project
  */
 configurations.all {
     resolutionStrategy {
-        force("com.google.protobuf:protobuf-java:4.30.0")
-        force("com.google.protobuf:protobuf-kotlin:4.30.0")
+        force("com.google.protobuf:protobuf-java:4.31.0")
+        force("com.google.protobuf:protobuf-kotlin:4.31.0")
     }
 }
 
@@ -48,13 +48,14 @@ dependencies {
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
 
     // RESTEasy Reactive (new group ID)
-    implementation("io.quarkus.resteasy.reactive:resteasy-reactive")
-    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jackson")
-    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jsonb")
-    implementation("io.quarkus:quarkus-rest-client-kotlin-serialization")
+//    implementation("io.quarkus.resteasy.reactive:resteasy-reactive")
+//    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jackson")
+//    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jsonb")
+
+//    implementation("io.quarkus:quarkus-rest-client-kotlin-serialization")
 
     // WebSocket
-    implementation("io.quarkus:quarkus-websockets-client")
+//    implementation("io.quarkus:quarkus-websockets-client")
 
     // Other project dependencies
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -62,7 +63,7 @@ dependencies {
     implementation("com.rubiconproject.oss:jchronic:0.2.8")
     implementation("io.github.yamilmedina:natural-kron:2.0.0")
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
-    implementation("com.wire:wire-apps-jvm-sdk:0.0.5")
+    implementation("com.wire:wire-apps-jvm-sdk:0.0.7")
 
     // Test dependencies
     testImplementation("io.quarkus:quarkus-junit5")
