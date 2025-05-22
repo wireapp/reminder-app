@@ -13,6 +13,7 @@ import com.wire.bots.domain.reminder.Reminder
 import io.github.yamilmedina.kron.NaturalKronParser
 import java.time.Instant
 import java.util.UUID
+import com.wire.integrations.jvm.model.QualifiedId
 
 object ReminderMapper {
     private val INVALID_TIME_TOKENS = listOf("hour", "minute", "second")
@@ -28,7 +29,7 @@ object ReminderMapper {
         INVALID_TIME_TOKENS.any { schedule.contains(it) }
 
     fun parseReminder(
-        conversationId: String,
+        conversationId: QualifiedId,
         task: String,
         schedule: String
     ): Either<BotError, Event> =
@@ -58,7 +59,7 @@ object ReminderMapper {
 
     private fun parseSingleTask(
         schedule: String,
-        conversationId: String,
+        conversationId: QualifiedId,
         task: String
     ): Either<BotError.ReminderError, Command.NewReminder> {
         return runCatching {
@@ -94,7 +95,7 @@ object ReminderMapper {
     }
 
     private fun parseRecurrentTask(
-        conversationId: String,
+        conversationId: QualifiedId,
         task: String,
         schedule: String
     ): Either<BotError.ReminderError, Command.NewReminder> =

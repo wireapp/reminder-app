@@ -21,6 +21,7 @@ import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.event.EventProcessor
 import com.wire.integrations.jvm.WireAppSdk
 import com.wire.integrations.jvm.WireEventsHandlerSuspending
+import com.wire.integrations.jvm.model.QualifiedId
 import com.wire.integrations.jvm.model.WireMessage
 import com.wire.integrations.jvm.service.WireApplicationManager
 import io.quarkus.runtime.Startup
@@ -70,15 +71,15 @@ class MlsSdkClient(
                     private fun createEventDTOFromWireMessage(
                         wireMessage: WireMessage.Text
                     ): EventDTO {
-                        val textId = wireMessage.conversationId.id
-                        val textDomain = wireMessage.conversationId.domain
-                        val textQualifiedId = "$textId@$textDomain"
+//                        val textId = wireMessage.conversationId.id
+//                        val textDomain = wireMessage.conversationId.domain
+//                        val textQualifiedId = "$textId@$textDomain"
                         return EventDTO(
                             type = EventTypeDTO.NEW_TEXT,
                             botId = "",
-                            userId = wireMessage.sender?.id?.toString().orEmpty(),
-                            conversationId = textQualifiedId,
-                            text = wireMessage.text?.let { TextContent(it) }
+                            userId = wireMessage.sender.id.toString().orEmpty(),
+                            conversationId = wireMessage.conversationId,
+                            text = wireMessage.text.let { TextContent(it) }
                         )
                     }
 

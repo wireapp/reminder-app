@@ -3,7 +3,7 @@ package com.wire.bots.domain.usecase
 import arrow.core.Either
 import arrow.core.flatMap
 import com.wire.bots.domain.DomainComponent
-import com.wire.bots.domain.PlainConversationId
+import com.wire.integrations.jvm.model.QualifiedId
 import com.wire.bots.domain.reminder.ReminderRepository
 import com.wire.bots.domain.reminder.ReminderJobRepository
 
@@ -17,7 +17,7 @@ class DeleteReminderUseCase(
 ) {
     operator fun invoke(
         reminderId: String,
-        conversationId: PlainConversationId
+        conversationId: QualifiedId
     ): Either<Throwable, Unit> =
         reminderRepository
             .deleteReminder(reminderId, conversationId)

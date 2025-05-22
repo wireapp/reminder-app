@@ -15,20 +15,20 @@ class MlsSdkOutgoingMessageRepository(
     val conversationRemoteApi: MlsSdkClient
 ) : OutgoingMessageRepository {
     override fun sendMessage(
-        conversationId: PlainConversationId,
+        conversationId: QualifiedId,
         messageContent: String
     ): Either<Throwable, Unit> =
         either {
-            val splitConversation = conversationId.split("@")
-            val uuid = UUID.fromString(splitConversation[0])
-            val domain = splitConversation[1]
-            val qualifiedID = QualifiedId(uuid, domain)
+//            val splitConversation = conversationId.split("@")
+//            val uuid = UUID.fromString(splitConversation[0])
+//            val domain = splitConversation[1]
+//            val qualifiedID = QualifiedId(uuid, domain)
             val manager = conversationRemoteApi.getManager()
             val message = WireMessage.Text.create(
-                conversationId = qualifiedID,
+                conversationId = conversationId,
                 text = messageContent
             )
-            manager?.sendMessage(
+            manager.sendMessage(
                 message = message
             )
         }

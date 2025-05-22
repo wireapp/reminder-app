@@ -6,6 +6,7 @@ import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.domain.reminder.ReminderJobRepository
 import com.wire.bots.domain.reminder.ReminderNextSchedule
 import com.wire.bots.infrastructure.jobs.ReminderJob
+import com.wire.integrations.jvm.model.QualifiedId
 import jakarta.enterprise.context.ApplicationScoped
 import org.quartz.CronScheduleBuilder
 import org.quartz.JobBuilder
@@ -24,7 +25,7 @@ class DefaultReminderJobRepository(
         val job =
             JobBuilder
                 .newJob(ReminderJob::class.java)
-                .withIdentity(JobKey.jobKey(reminder.taskId, reminder.conversationId))
+                .withIdentity(JobKey.jobKey(reminder.taskId, reminder.conversationId.toString()))
                 .build()
 
         val trigger = buildTrigger(reminder)
@@ -35,10 +36,10 @@ class DefaultReminderJobRepository(
 
     override fun cancelReminderJob(
         reminderId: String,
-        conversationId: String
+        conversationId: QualifiedId
     ): Either<Throwable, Unit> =
         Either.catch {
-            quartz.deleteJob(JobKey.jobKey(reminderId, conversationId))
+            quartz.deleteJob(JobKey.jobKey(reminderId, conversationId.toString()))
         }
 
     /**
@@ -52,7 +53,7 @@ class DefaultReminderJobRepository(
                     .newTrigger()
                     .withIdentity(
                         "mySingleTriggerFor_${reminder.taskId}",
-                        reminder.conversationId
+                        reminder.conversationId.toString()
                     ).startAt(Date.from(reminder.scheduledAt.minusSeconds(SECONDS_BEFORE_WARMUP)))
                     .withSchedule(
                         SimpleScheduleBuilder.repeatSecondlyForTotalCount(SINGLE_TIME_COUNT_JOB)
@@ -64,7 +65,7 @@ class DefaultReminderJobRepository(
                     .newTrigger()
                     .withIdentity(
                         "myRecurringTriggerFor_${reminder.taskId}",
-                        reminder.conversationId
+                        reminder.conversationId.toString()
                     ).startNow()
                     .withSchedule(CronScheduleBuilder.cronSchedule(reminder.scheduledCron))
                     .build()

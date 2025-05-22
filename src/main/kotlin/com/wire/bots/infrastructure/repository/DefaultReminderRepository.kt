@@ -1,7 +1,7 @@
 package com.wire.bots.infrastructure.repository
 
 import arrow.core.Either
-import com.wire.bots.domain.PlainConversationId
+import com.wire.integrations.jvm.model.QualifiedId
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.domain.reminder.ReminderRepository
 import com.wire.bots.infrastructure.toDomain
@@ -21,14 +21,14 @@ class DefaultReminderRepository :
         }
 
     @Transactional
-    override fun countRemindersByConversationId(conversationId: PlainConversationId): Long {
+    override fun countRemindersByConversationId(conversationId: QualifiedId): Long {
         val result = count("conversationId", conversationId)
         return result
     }
 
     @Transactional
     override fun getReminderOnConversationId(
-        conversationId: PlainConversationId
+        conversationId: QualifiedId
     ): Either<Throwable, List<Reminder>> =
         Either.catch {
             list("conversationId", conversationId).map { it.toDomain() }
@@ -37,7 +37,7 @@ class DefaultReminderRepository :
     @Transactional
     override fun deleteReminder(
         reminderId: String,
-        conversationId: PlainConversationId
+        conversationId: QualifiedId
     ): Either<Throwable, Unit> =
         Either.catch {
             delete(

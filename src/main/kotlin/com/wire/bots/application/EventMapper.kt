@@ -8,6 +8,8 @@ import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.event.Signal
+import com.wire.integrations.jvm.model.QualifiedId
+
 
 object EventMapper {
     /**
@@ -18,25 +20,25 @@ object EventMapper {
             when (eventDTO.type) {
                 EventTypeDTO.NEW_TEXT -> {
                     parseCommand(
-                        conversationId = eventDTO.conversationId.orEmpty(),
+                        conversationId = eventDTO.conversationId,
                         rawCommand = eventDTO.text?.data.orEmpty()
                     )
                 }
 
                 EventTypeDTO.BOT_REMOVED ->
                     Signal
-                        .BotRemoved(eventDTO.conversationId.orEmpty()).right()
+                        .BotRemoved(eventDTO.conversationId).right()
 
                 EventTypeDTO.BOT_REQUEST ->
                     Signal
-                        .BotAdded(eventDTO.conversationId.orEmpty()).right()
+                        .BotAdded(eventDTO.conversationId).right()
 
                 else -> BotError.Skip.left()
             }
         }.getOrElse {
             BotError
                 .ReminderError(
-                    conversationId = eventDTO.conversationId.orEmpty(),
+                    conversationId = eventDTO.conversationId,
                     errorType = BotError.ErrorType.PARSE_ERROR
                 ).left()
         }
@@ -45,7 +47,7 @@ object EventMapper {
      * Parses the raw event string, and returns a [Command] object.
      */
     private fun parseCommand(
-        conversationId: String,
+        conversationId: QualifiedId,
         rawCommand: String
     ): Either<BotError, Event> =
         either {
@@ -63,7 +65,7 @@ object EventMapper {
         }
 
     private fun parseCommandArgs(
-        conversationId: String,
+        conversationId: QualifiedId,
         args: String
     ): Either<BotError, Event> =
         when {
@@ -80,7 +82,7 @@ object EventMapper {
         }
 
     private fun parseToCommand(
-        conversationId: String,
+        conversationId: QualifiedId,
         args: String
     ): Either<BotError, Event> {
         val reminderArgs = args
@@ -113,7 +115,7 @@ object EventMapper {
     }
 
     private fun parseDeleteCommand(
-        conversationId: String,
+        conversationId: QualifiedId,
         args: String
     ): Either<BotError, Event> {
         val reminderId = args.substringAfter("delete").trim()

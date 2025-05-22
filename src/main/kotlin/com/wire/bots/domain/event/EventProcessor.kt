@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.right
 import com.wire.bots.domain.DomainComponent
 import com.wire.bots.domain.event.handlers.CommandHandler
-//import com.wire.bots.domain.event.handlers.SignalHandler
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.domain.usecase.SaveReminderSchedule
 import org.slf4j.LoggerFactory
