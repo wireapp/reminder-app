@@ -47,7 +47,8 @@ object CronInterpreter {
         parts[CRON_MONTH_INDEX] == "*" &&
             parts[CRON_WEEKDAY_INDEX] == "*"
 
-    private fun isEveryWeek(parts: List<String>) = parts[CRON_WEEKDAY_INDEX] != "*"
+    private fun isEveryWeek(parts: List<String>) =
+        parts[CRON_WEEKDAY_INDEX] != "*" && parts[CRON_WEEKDAY_INDEX] != "?"
 
     private fun formatHour(parts: List<String>) = parts[CRON_HOUR_INDEX].padStart(2, '0')
 
