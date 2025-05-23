@@ -6,6 +6,7 @@ import arrow.core.right
 import com.wire.bots.domain.DomainComponent
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.domain.reminder.ReminderRepository
+import com.wire.integrations.jvm.model.QualifiedId
 
 /**
  * List all reminders for a conversation.
@@ -14,7 +15,7 @@ import com.wire.bots.domain.reminder.ReminderRepository
 class ListRemindersInConversation(
     private val reminderRepository: ReminderRepository
 ) {
-    operator fun invoke(conversationId: String): Either<Throwable, List<Reminder>> =
+    operator fun invoke(conversationId: QualifiedId): Either<Throwable, List<Reminder>> =
         Either.catch {
             return reminderRepository
                 .getReminderOnConversationId(conversationId)

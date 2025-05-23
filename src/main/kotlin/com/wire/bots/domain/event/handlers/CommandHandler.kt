@@ -10,6 +10,7 @@ import com.wire.bots.domain.reminder.ReminderNextSchedule
 import com.wire.bots.domain.usecase.DeleteReminderUseCase
 import com.wire.bots.domain.usecase.ListRemindersInConversation
 import com.wire.bots.domain.usecase.SaveReminderSchedule
+import com.wire.bots.infrastructure.utils.CronInterpreter
 
 @DomainComponent
 class CommandHandler(
@@ -23,14 +24,12 @@ class CommandHandler(
             is Command.LegacyHelp ->
                 outgoingMessageRepository.sendMessage(
                     conversationId = event.conversationId,
-                    token = event.token,
                     messageContent = createLegacyHelpMessage()
                 )
 
             is Command.Help ->
                 outgoingMessageRepository.sendMessage(
                     conversationId = event.conversationId,
-                    token = event.token,
                     messageContent = createHelpMessage()
                 )
 
@@ -47,13 +46,19 @@ class CommandHandler(
                 } else {
                     "The reminders in this conversation:\n" +
                         reminders.joinToString("\n") {
-                            "- What? ${it.task} (**${it.taskId}**)"
+                            "What: '${it.task}' at: ${
+                                when (it) {
+                                    is Reminder.SingleReminder -> it.scheduledAt
+                                    is Reminder.RecurringReminder -> CronInterpreter.interpretCron(
+                                        it.scheduledCron
+                                    )
+                                }
+                            } (`${it.taskId}`)"
                         }
                 }
 
             outgoingMessageRepository.sendMessage(
                 conversationId = command.conversationId,
-                token = command.token,
                 messageContent = message
             )
         }
@@ -62,7 +67,6 @@ class CommandHandler(
         saveReminderSchedule(command.reminder).flatMap {
             outgoingMessageRepository.sendMessage(
                 conversationId = command.conversationId,
-                token = command.token,
                 messageContent = getCreatedMessage(it)
             )
         }
@@ -75,14 +79,12 @@ class CommandHandler(
                 deleteReminder.invoke(reminder.taskId, reminder.conversationId).flatMap {
                     outgoingMessageRepository.sendMessage(
                         conversationId = command.conversationId,
-                        token = command.token,
                         messageContent = "The reminder '${reminder.task}' was deleted."
                     )
                 }
             } else {
                 outgoingMessageRepository.sendMessage(
                     conversationId = command.conversationId,
-                    token = command.token,
                     messageContent = "The reminder with id '${command.reminderId}' was not found."
                 )
             }
@@ -112,13 +114,13 @@ class CommandHandler(
     companion object {
         fun createLegacyHelpMessage(): String =
             """
-            Hi, I'm the Reminders bot.
+            Hi, I'm the Remind App.
             Please use my specific help event **`/remind help`** to get more information about how to use me.
             """.trimIndent()
 
         fun createHelpMessage(): String =
             """
-            Hi, I'm the Reminders bot.
+            Hi, I'm the Remind App.
             I can help you to create reminders for your conversations, or yourself.
             
             1. You can start by creating a reminder with the following event, some valid examples are:

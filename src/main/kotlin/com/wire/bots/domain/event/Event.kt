@@ -1,111 +1,98 @@
 package com.wire.bots.domain.event
 
-import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.reminder.Reminder
+import com.wire.integrations.jvm.model.QualifiedId
 
 sealed interface Event {
-    val conversationId: PlainConversationId
-    val token: String
+    val conversationId: QualifiedId
 }
 
 sealed class Command(
-    override val conversationId: PlainConversationId,
-    override val token: String
+    override val conversationId: QualifiedId
 ) : Event {
     /**
      * Help event for bot usage
      */
     data class Help(
-        override val conversationId: PlainConversationId,
-        override val token: String
-    ) : Command(conversationId, token)
+        override val conversationId: QualifiedId
+    ) : Command(conversationId)
 
     /**
      * Legacy Help event (without suffix) suggesting to use the new help event.
      */
     data class LegacyHelp(
-        override val conversationId: PlainConversationId,
-        override val token: String
-    ) : Command(conversationId, token)
+        override val conversationId: QualifiedId
+    ) : Command(conversationId)
 
     /**
      * New reminder event, for the target conversation.
      */
     data class NewReminder(
-        override val conversationId: PlainConversationId,
-        override val token: String,
+        override val conversationId: QualifiedId,
         val reminder: Reminder
-    ) : Command(conversationId, token)
+    ) : Command(conversationId)
 
     /**
      * List reminders event, for the target conversation.
      */
     data class ListReminders(
-        override val conversationId: PlainConversationId,
-        override val token: String
-    ) : Command(conversationId, token)
+        override val conversationId: QualifiedId
+    ) : Command(conversationId)
 
     /**
      * Delete reminder event, for the target conversation.
      */
     data class DeleteReminder(
-        override val conversationId: PlainConversationId,
-        override val token: String,
+        override val conversationId: QualifiedId,
         val reminderId: String
-    ) : Command(conversationId, token)
+    ) : Command(conversationId)
 }
 
 sealed class Signal(
-    override val conversationId: PlainConversationId,
-    override val token: String
+    override val conversationId: QualifiedId
 ) : Event {
     /**
      * Bot added to the conversation, time to save Token to ConversationId.
      */
     data class BotAdded(
-        override val conversationId: PlainConversationId,
-        override val token: String
-    ) : Signal(conversationId, token)
+        override val conversationId: QualifiedId
+    ) : Signal(conversationId)
 
     /**
      * Bot removed from the conversation, time to all related data from the conversation.
      */
     data class BotRemoved(
-        override val conversationId: PlainConversationId,
-        override val token: String
-    ) : Signal(conversationId, token)
+        override val conversationId: QualifiedId
+    ) : Signal(conversationId)
 }
 
 sealed class BotError(
-    open val conversationId: PlainConversationId,
-    open val token: String,
+    override val conversationId: QualifiedId,
     open val reason: String = "Core error"
-) : Exception() {
+) : Exception(), Event {
     /**
      * An event that can be ignored-skipped by the bot
      * For example, user added to the conversation, mentions, etc.
      *
      * This event should be logged, but not processed.
      */
-    data object Skip : BotError("", "")
+    data object Skip : BotError(QualifiedId(java.util.UUID.randomUUID(), ""), "")
 
     /**
      * Unknown event, or error while parsing the event by the bot.o
      */
     data class Unknown(
-        override val conversationId: PlainConversationId,
-        override val token: String,
+        override val conversationId: QualifiedId,
         override val reason: String = "Unknown event"
-    ) : BotError(conversationId, token, reason)
+    ) : BotError(conversationId, reason)
 
     /**
      * Error while processing the reminder.
      */
     data class ReminderError(
-        override val conversationId: PlainConversationId,
-        override val token: String,
+        override val conversationId: QualifiedId,
         val errorType: ErrorType
-    ) : BotError(conversationId, token, errorType.message)
+    ) : BotError(conversationId, errorType.message)
 
     enum class ErrorType(
         val message: String

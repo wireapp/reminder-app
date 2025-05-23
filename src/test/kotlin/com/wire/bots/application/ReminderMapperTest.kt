@@ -2,15 +2,22 @@ package com.wire.bots.application
 
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.shouldFail
+import com.wire.integrations.jvm.model.QualifiedId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
+import java.util.UUID
+
+private val TEST_CONVERSATION_ID = QualifiedId(
+    UUID.fromString("00000000-000-0000-0000-000000000001"),
+    "domain"
+)
 
 class ReminderMapperTest {
     @Test
     fun givenASchedule_whenIsRecurringByTimeIncrement_ThenRaiseError() {
         // given - when
-        val result = ReminderMapper.parseReminder("conversationId", "token", "task", "every hour")
+        val result = ReminderMapper.parseReminder(TEST_CONVERSATION_ID, "task", "every hour")
 
         // then
         result.shouldFail {
@@ -26,8 +33,7 @@ class ReminderMapperTest {
     fun givenASchedule_whenIsInThePast_ThenRaiseError() {
         // given - when
         val result = ReminderMapper.parseReminder(
-            "conversationId",
-            "token",
+            TEST_CONVERSATION_ID,
             "task",
             "on 1990-01-01"
         )
@@ -46,8 +52,7 @@ class ReminderMapperTest {
     fun givenASchedule_whenContainsNotBeingAbleToParse_ThenRaiseError() {
         // given - when
         val result = ReminderMapper.parseReminder(
-            "conversationId",
-            "token",
+            TEST_CONVERSATION_ID,
             "task",
             "SOME INVALID SCHEDULE"
         )
@@ -66,8 +71,7 @@ class ReminderMapperTest {
     fun givenASchedule_whenContainsNotBeingAbleToParseExpression_ThenRaiseError() {
         // given - when
         val result = ReminderMapper.parseReminder(
-            "conversationId",
-            "token",
+            TEST_CONVERSATION_ID,
             "task",
             "not/valid/expression"
         )
