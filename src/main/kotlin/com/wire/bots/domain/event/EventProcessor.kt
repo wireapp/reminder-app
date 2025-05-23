@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory
 @DomainComponent
 class EventProcessor(
     val commandHandler: CommandHandler,
-//    val signalHandler: SignalHandler,
     val outgoingMessageRepository: OutgoingMessageRepository
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -25,7 +24,6 @@ class EventProcessor(
     fun process(event: Event): Either<Throwable, Unit> =
         when (event) {
             is Command -> commandHandler.onEvent(event)
-//            is Signal -> signalHandler.onEvent(event)
             else -> Either.Left(
                 IllegalArgumentException("Unhandled event type: ${event::class.simpleName}")
             )

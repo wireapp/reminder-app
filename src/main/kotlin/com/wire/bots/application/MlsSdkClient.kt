@@ -71,9 +71,6 @@ class MlsSdkClient(
                     private fun createEventDTOFromWireMessage(
                         wireMessage: WireMessage.Text
                     ): EventDTO {
-//                        val textId = wireMessage.conversationId.id
-//                        val textDomain = wireMessage.conversationId.domain
-//                        val textQualifiedId = "$textId@$textDomain"
                         return EventDTO(
                             type = EventTypeDTO.NEW_TEXT,
                             botId = "",

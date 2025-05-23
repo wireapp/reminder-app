@@ -47,16 +47,6 @@ dependencies {
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
 
-    // RESTEasy Reactive (new group ID)
-//    implementation("io.quarkus.resteasy.reactive:resteasy-reactive")
-//    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jackson")
-//    implementation("io.quarkus.resteasy.reactive:resteasy-reactive-jsonb")
-
-//    implementation("io.quarkus:quarkus-rest-client-kotlin-serialization")
-
-    // WebSocket
-//    implementation("io.quarkus:quarkus-websockets-client")
-
     // Other project dependencies
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
