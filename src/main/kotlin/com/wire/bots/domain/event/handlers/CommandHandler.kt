@@ -10,6 +10,7 @@ import com.wire.bots.domain.reminder.ReminderNextSchedule
 import com.wire.bots.domain.usecase.DeleteReminderUseCase
 import com.wire.bots.domain.usecase.ListRemindersInConversation
 import com.wire.bots.domain.usecase.SaveReminderSchedule
+import com.wire.bots.infrastructure.utils.CronInterpreter
 
 @DomainComponent
 class CommandHandler(
@@ -36,37 +37,6 @@ class CommandHandler(
             is Command.ListReminders -> getReminderListMessage(event)
             is Command.DeleteReminder -> deleteReminder(event)
         }
-    private fun interpretCron(cron: String): String {
-        // Very basic cron parser: "second minute hour day month weekday"
-        val parts = cron.trim().split("\\s+".toRegex())
-        if (parts.size < 6) return "(invalid cron)"
-
-        return when {
-            parts[0] == "*" && parts[1] == "*" && parts[2] == "*" && parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
-                "every second"
-
-            parts[1] == "*" && parts[2] == "*" && parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
-                "every minute"
-
-            parts[2] == "*" && parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
-                "every hour"
-
-            // Recognize "every day at HH:mm" for "0 0 10 ? * *"
-            (parts[0] == "0" && parts[1] == "0" && parts[3] == "?" && parts[4] == "*" && parts[5] == "*") ->
-                "every day at ${parts[2].padStart(2, '0')}:00"
-
-            parts[3] == "*" && parts[4] == "*" && parts[5] == "*" ->
-                "every day at ${parts[2]}:${parts[1].padStart(2, '0')}"
-
-            parts[4] == "*" && parts[5] == "*" ->
-                "every month on day ${parts[3]} at ${parts[2]}:${parts[1].padStart(2, '0')}"
-
-            parts[5] != "*" ->
-                "every week on ${parts[5]} at ${parts[2]}:${parts[1].padStart(2, '0')}"
-
-            else -> "every (custom cron: $cron)"
-        }
-    }
 
     private fun getReminderListMessage(command: Command.ListReminders): Either<Throwable, Unit> =
         listRemindersInConversation(command.conversationId).flatMap { reminders ->
@@ -79,7 +49,9 @@ class CommandHandler(
                             "What: '${it.task}' at: ${
                                 when (it) {
                                     is Reminder.SingleReminder -> it.scheduledAt
-                                    is Reminder.RecurringReminder -> interpretCron(it.scheduledCron)
+                                    is Reminder.RecurringReminder -> CronInterpreter.interpretCron(
+                                        it.scheduledCron
+                                    )
                                 }
                             } (`${it.taskId}`)"
                         }

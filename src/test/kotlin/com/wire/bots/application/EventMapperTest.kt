@@ -9,16 +9,15 @@ import com.wire.bots.shouldSucceed
 import com.wire.integrations.jvm.model.QualifiedId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class EventMapperTest {
-    private val TEST_CONVERSATION_ID = QualifiedId(
-        UUID.fromString("00000000-000-0000-0000-000000000001"),
-        "domain"
-    )
+private val TEST_CONVERSATION_ID = QualifiedId(
+    UUID.fromString("00000000-000-0000-0000-000000000001"),
+    "domain"
+)
 
+class EventMapperTest {
     @Test
     fun givenNotRelevantEvent_whenMapping_ThenReturnSkip() {
         // given

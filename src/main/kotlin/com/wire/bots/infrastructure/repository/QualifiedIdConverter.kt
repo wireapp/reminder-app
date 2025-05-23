@@ -8,9 +8,7 @@ import com.wire.integrations.jvm.model.QualifiedId
 
 @Converter(autoApply = true)
 class QualifiedIdConverter : AttributeConverter<QualifiedId, String> {
-    override fun convertToDatabaseColumn(attribute: QualifiedId): String =
-        attribute.toRawString()
+    override fun convertToDatabaseColumn(attribute: QualifiedId): String = attribute.toRawString()
 
-    override fun convertToEntityAttribute(dbData: String): QualifiedId =
-        dbData.toQualifiedId()
+    override fun convertToEntityAttribute(dbData: String): QualifiedId = dbData.toQualifiedId()
 }

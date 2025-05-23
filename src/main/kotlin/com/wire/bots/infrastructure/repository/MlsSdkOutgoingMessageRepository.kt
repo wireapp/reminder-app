@@ -3,12 +3,10 @@ package com.wire.bots.infrastructure.repository
 import arrow.core.Either
 import arrow.core.raise.either
 import com.wire.bots.application.MlsSdkClient
-import com.wire.bots.domain.PlainConversationId
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.integrations.jvm.model.QualifiedId
 import com.wire.integrations.jvm.model.WireMessage
 import jakarta.enterprise.context.ApplicationScoped
-import java.util.UUID
 
 @ApplicationScoped
 class MlsSdkOutgoingMessageRepository(

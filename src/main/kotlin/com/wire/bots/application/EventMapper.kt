@@ -10,7 +10,6 @@ import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.event.Signal
 import com.wire.integrations.jvm.model.QualifiedId
 
-
 object EventMapper {
     /**
      * Maps the [EventDTO] to an [Event] either [Command] object or [Signal], so it can be processed by the application.

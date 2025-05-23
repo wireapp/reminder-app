@@ -7,7 +7,7 @@ fun QualifiedId.toRawString(): String = "$id@$domain"
 
 fun String.toQualifiedId(): QualifiedId {
     val splitQualifiedId = this.split("@")
-    if (splitQualifiedId.size != 2) throw IllegalArgumentException("Invalid QualifiedId format")
+    if (splitQualifiedId.size != 2) require(false) { "Invalid QualifiedId format" }
     val uuid = UUID.fromString(splitQualifiedId[0])
     val domain = splitQualifiedId[1]
     return QualifiedId(uuid, domain)

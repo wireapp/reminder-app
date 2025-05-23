@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import com.wire.integrations.jvm.model.QualifiedId
 
-
 @Serializable
 data class EventDTO(
     val type: EventTypeDTO,

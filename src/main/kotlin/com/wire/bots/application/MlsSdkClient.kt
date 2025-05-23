@@ -21,7 +21,6 @@ import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.event.EventProcessor
 import com.wire.integrations.jvm.WireAppSdk
 import com.wire.integrations.jvm.WireEventsHandlerSuspending
-import com.wire.integrations.jvm.model.QualifiedId
 import com.wire.integrations.jvm.model.WireMessage
 import com.wire.integrations.jvm.service.WireApplicationManager
 import io.quarkus.runtime.Startup
