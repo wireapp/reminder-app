@@ -4,9 +4,7 @@ import com.wire.bots.infrastructure.utils.CronInterpreter
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-
 class CronInterpreterTest {
-
     @Test
     fun `should return every hour for valid hourly cron`() {
         val cron = "* * * * * *"
