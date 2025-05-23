@@ -1,13 +1,22 @@
 # Wire Remind-App (ex. Reminders-Bot)
 
-- ### Is migrating from Roman to MLS with WireSDK.
-- ### Reminder features recovered.
-- ### TODO: Code need to be cleaned and refactored.
+**Migrated from Roman to MLS using WireSDK.**
 
-### Latest features update:
-- You can delete reminder with `/remind delete <reminder-identifier>` command.
-> This is on development and not ready for production use.
+## Latest features update:
+- **Delete reminders:** Use `/remind delete <reminder-identifier>` to remove a reminder from the group.
+- **List reminders:** Use `/remind list` to view all active reminders and their scheduled times in the group.
+- **Recurring reminders:** App interprets and displays the schedule for recurring reminders, showing when they will repeat (for example, every Monday at 10:00).
+- **Limitation:** Only one weekday can be set per each weekly recurring reminder (for example "every monday at 13:00").
 
+> **Note:** This app is in development and not ready for production use.
+
+## Next PRs:
+- **Increase number of active reminders:** Currently, the app only supports a maximum of 3 active reminders per group.
+- **Add support for multiple weekday reminders:** for example "every monday, tuesday and friday at 13:00".
+- **Add support for multiple weekday definition:** for example Monday could be: monday, Monday, Mon, mon., MON etc.
+- **Add buttons to delete reminders:** to make it easier for users to manage their reminders.
+
+## Overview
 This is an app that can create reminders for you and your group, and send you a message when the reminder is due.
 
 > [!IMPORTANT]  
