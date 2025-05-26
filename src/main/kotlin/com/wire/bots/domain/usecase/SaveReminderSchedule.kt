@@ -47,6 +47,6 @@ class SaveReminderSchedule(
     ) : Throwable("Max reminder jobs reached: $max")
 
     companion object {
-        private const val MAX_REMINDER_JOBS = 3
+        private const val MAX_REMINDER_JOBS = 5
     }
 }

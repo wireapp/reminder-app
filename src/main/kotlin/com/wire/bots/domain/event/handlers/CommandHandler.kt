@@ -96,14 +96,22 @@ class CommandHandler(
                 "I will remind you to **'${reminder.task}'** at:\n" +
                     "**${reminderNextSchedule.nextSchedules.first()}**.\n" +
                     "If you want to delete it, you can use the command:\n" +
-                    "`/remind delete ${reminder.taskId}`"
+                    """
+                    ```
+                    /remind delete ${reminder.taskId}
+                    ```
+                    """.trimIndent()
             }
 
             is Reminder.RecurringReminder -> {
                 "I will periodically remind you to **'${reminder.task}'**.\n" +
                     "If you want to delete it, you can use the command:\n" +
-                    "`/remind delete ${reminder.taskId}`\n\n" +
-                    "The next ${reminderNextSchedule.nextSchedules.size} " +
+                    """
+                    ```
+                    /remind delete ${reminder.taskId}
+                    ```
+                    """.trimIndent() +
+                    "\nThe next ${reminderNextSchedule.nextSchedules.size} " +
                     "schedules for the reminder is:\n" +
                     reminderNextSchedule.nextSchedules.joinToString("\n") {
                         "- $it"
@@ -120,27 +128,30 @@ class CommandHandler(
 
         fun createHelpMessage(): String =
             """
-            Hi, I'm the Remind App.
-            I can help you to create reminders for your conversations, or yourself.
+            **Hi, I'm the Remind App.**
+            **I can help you to create reminders for your conversations, or yourself.**
             
-            1. You can start by creating a reminder with the following event, some valid examples are:
-            
-            `/remind to "do something" "in 5 minutes"`
-            `/remind to "do something" "today at 21:00"`
-            `/remind to "do something" "18/09/2024 at 09:45"`
-            `/remind to "do something" "next monday at 17:00"`
-            
-            You can also create a reminder that repeats, for example:
-            
-            `/remind to "Start the daily stand up" "every day at 10:00"`
-            
-            2. You can list all the active reminders in the conversation with the following event:
-            
-            `/remind list`
-            
-            3. And you can delete a reminder with the following event:
-            
-            `/remind delete <reminderId>` (you can get the <reminderId> from the list event)
+            1. You can create one time reminders, for example:
+            ```
+            /remind to "do something" "in 5 minutes"
+            /remind to "do something" "today at 21:00"
+            /remind to "do something" "18/09/2025 at 09:45"
+            /remind to "do something" "next monday at 17:00"
+            ```
+            2. You can also create a recurring reminders, for example:
+            ```
+            /remind to "Start the daily stand up" "every day at 10:00"
+            /remind to "Start the weekly stand up" "every friday at 10:00"
+            ```
+            3. You can list all the active reminders in the conversation with the following event:
+            ```
+            /remind list
+            ```
+            4. And you can delete a reminder with the following event:
+            (you can get the <reminderId> from the `/remind list` command)
+            ```
+            /remind delete <reminderId>
+            ```
             """.trimIndent()
     }
 }

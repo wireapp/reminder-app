@@ -127,9 +127,9 @@ internal val COMMAND_HINT =
     """
     Unknown command, valid options are:
     ```
-    > /remind help
-    > /remind list
-    > /remind to "what" "when"
-    > /remind delete <reminderId>
+    /remind help
+    /remind list
+    /remind to "what" "when"
+    /remind delete <reminderId>
     ```
     """.trimIndent()
