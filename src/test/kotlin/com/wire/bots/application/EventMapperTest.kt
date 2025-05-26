@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-private val TEST_CONVERSATION_ID = QualifiedId(
+internal val TEST_CONVERSATION_ID = QualifiedId(
     UUID.fromString("00000000-000-0000-0000-000000000001"),
     "domain"
 )
