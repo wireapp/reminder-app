@@ -132,7 +132,6 @@ If you want to learn more about building native executables, please consult http
 - Flyway ([guide](https://quarkus.io/guides/flyway)): Handle your database schema migrations
 - Quartz ([guide](https://quarkus.io/guides/quartz)): Schedule clustered tasks with Quartz
 - Kotlin ([guide](https://quarkus.io/guides/kotlin)): Write your services in Kotlin
-- RESTEasy Classic ([guide](https://quarkus.io/guides/resteasy)): REST endpoint framework implementing Jakarta REST and more
 - JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
 
 ## Provided Code

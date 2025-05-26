@@ -2,7 +2,6 @@ package com.wire.bots.application
 
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
-import com.wire.bots.domain.event.Signal
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.shouldFail
 import com.wire.bots.shouldSucceed
@@ -35,44 +34,6 @@ class EventMapperTest {
         // then
         event.shouldFail {
             assertInstanceOf(BotError.Skip::class.java, it)
-        }
-    }
-
-    @Test
-    fun givenBotInitEvent_whenMapping_ThenReturnSignalBotInit() {
-        // given
-        val eventDTO =
-            EventDTO(
-                type = EventTypeDTO.BOT_REQUEST,
-                conversationId = TEST_CONVERSATION_ID,
-                botId = "botId"
-            )
-
-        // when
-        val event = EventMapper.fromEvent(eventDTO)
-
-        // then
-        event.shouldSucceed {
-            assertEquals(Signal.BotAdded(TEST_CONVERSATION_ID), it)
-        }
-    }
-
-    @Test
-    fun givenBotRemovedEvent_whenMapping_ThenReturnSignalBotInit() {
-        // given
-        val eventDTO =
-            EventDTO(
-                type = EventTypeDTO.BOT_REMOVED,
-                conversationId = TEST_CONVERSATION_ID,
-                botId = "botId"
-            )
-
-        // when
-        val event = EventMapper.fromEvent(eventDTO)
-
-        // then
-        event.shouldSucceed {
-            assertEquals(Signal.BotRemoved(TEST_CONVERSATION_ID), it)
         }
     }
 

@@ -7,12 +7,11 @@ import arrow.core.right
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.event.Event
-import com.wire.bots.domain.event.Signal
 import com.wire.integrations.jvm.model.QualifiedId
 
 object EventMapper {
     /**
-     * Maps the [EventDTO] to an [Event] either [Command] object or [Signal], so it can be processed by the application.
+     * Maps the [EventDTO] to an [Event] either [Command] object so it can be processed by the application.
      */
     fun fromEvent(eventDTO: EventDTO): Either<BotError, Event> =
         runCatching {
@@ -23,15 +22,6 @@ object EventMapper {
                         rawCommand = eventDTO.text?.data.orEmpty()
                     )
                 }
-
-                EventTypeDTO.BOT_REMOVED ->
-                    Signal
-                        .BotRemoved(eventDTO.conversationId).right()
-
-                EventTypeDTO.BOT_REQUEST ->
-                    Signal
-                        .BotAdded(eventDTO.conversationId).right()
-
                 else -> BotError.Skip.left()
             }
         }.getOrElse {

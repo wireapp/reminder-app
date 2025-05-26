@@ -49,24 +49,6 @@ sealed class Command(
     ) : Command(conversationId)
 }
 
-sealed class Signal(
-    override val conversationId: QualifiedId
-) : Event {
-    /**
-     * Bot added to the conversation, time to save Token to ConversationId.
-     */
-    data class BotAdded(
-        override val conversationId: QualifiedId
-    ) : Signal(conversationId)
-
-    /**
-     * Bot removed from the conversation, time to all related data from the conversation.
-     */
-    data class BotRemoved(
-        override val conversationId: QualifiedId
-    ) : Signal(conversationId)
-}
-
 sealed class BotError(
     override val conversationId: QualifiedId,
     open val reason: String = "Core error"
