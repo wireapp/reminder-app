@@ -17,10 +17,6 @@ class MlsSdkOutgoingMessageRepository(
         messageContent: String
     ): Either<Throwable, Unit> =
         either {
-//            val splitConversation = conversationId.split("@")
-//            val uuid = UUID.fromString(splitConversation[0])
-//            val domain = splitConversation[1]
-//            val qualifiedID = QualifiedId(uuid, domain)
             val manager = conversationRemoteApi.getManager()
             val message = WireMessage.Text.create(
                 conversationId = conversationId,
