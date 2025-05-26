@@ -40,9 +40,9 @@ private val logger = LoggerFactory.getLogger("RemindAppMlsSdk")
 @Startup
 class MlsSdkClient(
     private val eventProcessor: EventProcessor,
-    @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.bot-key")
+    @ConfigProperty(name = "wire-sdk-api.bot-key")
     private val apiToken: String,
-    @ConfigProperty(name = "quarkus.rest-client.wire-proxy-services-api.url")
+    @ConfigProperty(name = "wire-sdk-api.url")
     private val apiHost: String
 ) {
     private lateinit var manager: WireApplicationManager
@@ -58,26 +58,16 @@ class MlsSdkClient(
                 apiHost = apiHost,
                 cryptographyStoragePassword = "myDummyPassword",
                 wireEventsHandler = object : WireEventsHandlerSuspending() {
-                    override suspend fun onMessage(wireMessage: WireMessage.Text) {
-                        logger.info(
-                            "Received Text Message from conversation: " +
-                                "${wireMessage.conversationId}"
+                    override suspend fun onMessage(wireMessage: WireMessage.Text) =
+                        processEvent(
+                            EventDTO(
+                                type = EventTypeDTO.NEW_TEXT,
+                                botId = "",
+                                userId = wireMessage.sender.id.toString().orEmpty(),
+                                conversationId = wireMessage.conversationId,
+                                text = wireMessage.text.let { TextContent(it) }
+                            )
                         )
-                        val eventDTO = createEventDTOFromWireMessage(wireMessage)
-                        processEvent(eventDTO)
-                    }
-
-                    private fun createEventDTOFromWireMessage(
-                        wireMessage: WireMessage.Text
-                    ): EventDTO {
-                        return EventDTO(
-                            type = EventTypeDTO.NEW_TEXT,
-                            botId = "",
-                            userId = wireMessage.sender.id.toString().orEmpty(),
-                            conversationId = wireMessage.conversationId,
-                            text = wireMessage.text.let { TextContent(it) }
-                        )
-                    }
 
                     override suspend fun onAsset(wireMessage: WireMessage.Asset) {
                         logger.info("Received Asset Message: $wireMessage")
