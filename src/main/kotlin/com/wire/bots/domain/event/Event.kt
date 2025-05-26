@@ -2,6 +2,7 @@ package com.wire.bots.domain.event
 
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.integrations.jvm.model.QualifiedId
+import java.util.UUID
 
 sealed interface Event {
     val conversationId: QualifiedId
@@ -76,7 +77,13 @@ sealed class BotError(
      *
      * This event should be logged, but not processed.
      */
-    data object Skip : BotError(QualifiedId(java.util.UUID.randomUUID(), ""), "")
+    data object Skip : BotError(
+        QualifiedId(
+            UUID.fromString("00000000-000-0000-0000-000000000000"),
+            ""
+        ),
+        "Skip event"
+    )
 
     /**
      * Unknown event, or error while parsing the event by the bot.o
