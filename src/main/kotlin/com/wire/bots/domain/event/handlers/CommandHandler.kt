@@ -49,11 +49,16 @@ class CommandHandler(
                             "What: '${it.task}' at: ${
                                 when (it) {
                                     is Reminder.SingleReminder -> it.scheduledAt
-                                    is Reminder.RecurringReminder -> CronInterpreter.interpretCron(
+                                    is Reminder.RecurringReminder -> CronInterpreter.cronToText(
                                         it.scheduledCron
                                     )
                                 }
-                            } (`${it.taskId}`)"
+                            }\n" +
+                                """
+                                ```
+                                /remind delete ${it.taskId}
+                                ```
+                                """.trimIndent()
                         }
                 }
 

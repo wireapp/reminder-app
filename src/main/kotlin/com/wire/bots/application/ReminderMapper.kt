@@ -9,17 +9,15 @@ import com.mdimension.jchronic.tags.Pointer
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.reminder.Reminder
-import io.github.yamilmedina.kron.NaturalKronParser
 import java.util.UUID
 import com.wire.integrations.jvm.model.QualifiedId
 import com.wire.bots.domain.usecase.ValidateReminder
+import com.wire.bots.infrastructure.utils.CronInterpreter
 
 object ReminderMapper {
     private val INVALID_TIME_TOKENS = listOf("hour", "minute", "second")
     private val VALID_RECURRENT_TOKENS = listOf("every")
     // todo: expand later, each, daily, weekly, etc.
-
-    private val naturalKronParser = NaturalKronParser()
 
     private fun isRecurrentSchedule(schedule: String): Boolean =
         VALID_RECURRENT_TOKENS.any { schedule.contains(it) }
@@ -103,7 +101,7 @@ object ReminderMapper {
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
                         task = task,
-                        scheduledCron = naturalKronParser.parse(schedule)
+                        scheduledCron = CronInterpreter.textToCron(schedule)
                     )
                 ).right()
         }.getOrElse {
