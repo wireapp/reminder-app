@@ -1,23 +1,17 @@
 # Wire Remind-App (ex. Reminders-Bot)
 
-**Migrated from Roman to MLS using WireSDK.**
-
-## Latest features update:
-- **Delete reminders:** Use `/remind delete <reminder-identifier>` to remove a reminder from the group.
-- **List reminders:** Use `/remind list` to view all active reminders and their scheduled times in the group.
-- **Recurring reminders:** App interprets and displays the schedule for recurring reminders, showing when they will repeat (for example, every Monday at 10:00).
-- **Limitation:** Only one weekday can be set per each weekly recurring reminder (for example "every monday at 13:00").
+**Driven by WireSDK using MLS protocol.**
 
 > **Note:** This app is in development and not ready for production use.
 
-## Next PRs:
-- **Increase number of active reminders:** Currently, the app only supports a maximum of 3 active reminders per group.
-- **Add support for multiple weekday reminders:** for example "every monday, tuesday and friday at 13:00".
-- **Add support for multiple weekday definition:** for example Monday could be: monday, Monday, Mon, mon., MON etc.
-- **Add buttons to delete reminders:** to make it easier for users to manage their reminders.
-
 ## Overview
 This is an app that can create reminders for you and your group, and send you a message when the reminder is due.
+
+## **Features**
+- Set one-time reminders
+- Set recurrent reminders (e.g., every Monday)
+- List active reminders
+- Delete reminders
 
 > [!IMPORTANT]  
 > As of now, the bot only supports a maximum of 3 active reminders per group, and recurrent reminders are supported only up to 5 repetitions.
@@ -34,11 +28,11 @@ This is an app that can create reminders for you and your group, and send you a 
 - If the reminder is recurrent or to happen relative to today, you must add the time in the format `<hh:mm> "21:15"`.
 
 > [!NOTE]  
-> You can set reminders for the entire group, but not for someone else (how rude would that be?).
+> You can set reminders for the entire conversation.
 >
 > You can also set reminders to repeat by the day (ex. every Monday), repetitions by time are not supported (ex. every hour).
 
-### Examples:
+### Set reminders examples:
 
 |                    | Command      | What                                           | When                      |
 |--------------------|--------------|------------------------------------------------|---------------------------|
@@ -134,10 +128,8 @@ If you want to learn more about building native executables, please consult http
 - Kotlin ([guide](https://quarkus.io/guides/kotlin)): Write your services in Kotlin
 - JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
 
-## Provided Code
-
-### RESTEasy JAX-RS
-
-Easily start your RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
+## Roadmap:
+- **Increase number of active reminders:** Currently, the app only supports a maximum of 3 active reminders per group.
+- **Add support for multiple weekday reminders:** for example "every monday, tuesday and friday at 13:00".
+- **Add support for multiple weekday definition:** for example Monday could be: monday, Monday, Mon, mon., MON etc.
+- **Add buttons to delete reminders:** to make it easier for users to manage their reminders.
