@@ -24,7 +24,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent("not relevant")
             )
 
@@ -44,7 +43,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent("/help")
             )
 
@@ -64,7 +62,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent("/remind help")
             )
 
@@ -84,7 +81,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent(
                     """/remind to "join the refinement session" "tomorrow at 11:00"""".trimIndent()
                 )
@@ -112,7 +108,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent(
                     """/remind to "join the daily stand up" "every monday at 10:00"""".trimIndent()
                 )
@@ -140,7 +135,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent(
                     """/remind to "drink water" "every 1 hours"""".trimIndent()
                 )
@@ -166,7 +160,6 @@ class EventMapperTest {
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
                 conversationId = TEST_CONVERSATION_ID,
-                botId = "botId",
                 text = TextContent("""/remind to "drink water" "yesterday" """.trimIndent())
             )
 
