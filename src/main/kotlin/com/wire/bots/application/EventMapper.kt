@@ -6,14 +6,13 @@ import arrow.core.raise.either
 import arrow.core.right
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
-import com.wire.bots.domain.event.Event
 import com.wire.integrations.jvm.model.QualifiedId
 
 object EventMapper {
     /**
-     * Maps the [EventDTO] to an [Event] either [Command] object so it can be processed by the application.
+     * Maps the [EventDTO] to a [Command] object so it can be processed by the application.
      */
-    fun fromEvent(eventDTO: EventDTO): Either<BotError, Event> =
+    fun fromEvent(eventDTO: EventDTO): Either<BotError, Command> =
         runCatching {
             when (eventDTO.type) {
                 EventTypeDTO.NEW_TEXT -> {
@@ -38,7 +37,7 @@ object EventMapper {
     private fun parseCommand(
         conversationId: QualifiedId,
         rawCommand: String
-    ): Either<BotError, Event> =
+    ): Either<BotError, Command> =
         either {
             val words = rawCommand.split(COMMAND_EXPRESSION)
             return when (words[0]) {
@@ -48,7 +47,6 @@ object EventMapper {
                         conversationId = conversationId,
                         args = rawCommand.substringAfter("/remind").trimStart()
                     )
-
                 else -> BotError.Skip.left()
             }
         }
@@ -56,7 +54,7 @@ object EventMapper {
     private fun parseCommandArgs(
         conversationId: QualifiedId,
         args: String
-    ): Either<BotError, Event> =
+    ): Either<BotError, Command> =
         when {
             args.trim() == "help" -> Command.Help(conversationId).right()
             args.trim() == "list" -> Command.ListReminders(conversationId).right()
@@ -73,10 +71,10 @@ object EventMapper {
     private fun parseToCommand(
         conversationId: QualifiedId,
         args: String
-    ): Either<BotError, Event> {
+    ): Either<BotError, Command> {
         val reminderArgs = args
             .substringAfter("to")
-            .split('\"', '“')
+            .split('"', '“')
             .filter { it.isNotBlank() }
         return if (reminderArgs.size != 2) {
             BotError
@@ -106,7 +104,7 @@ object EventMapper {
     private fun parseDeleteCommand(
         conversationId: QualifiedId,
         args: String
-    ): Either<BotError, Event> {
+    ): Either<BotError, Command> {
         val reminderId = args.substringAfter("delete").trim()
         return if (reminderId.isBlank()) {
             BotError

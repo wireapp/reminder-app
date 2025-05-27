@@ -4,13 +4,9 @@ import com.wire.bots.domain.reminder.Reminder
 import com.wire.integrations.jvm.model.QualifiedId
 import java.util.UUID
 
-sealed interface Event {
-    val conversationId: QualifiedId
-}
-
 sealed class Command(
-    override val conversationId: QualifiedId
-) : Event {
+    open val conversationId: QualifiedId
+) {
     /**
      * Help event for bot usage
      */
@@ -50,9 +46,9 @@ sealed class Command(
 }
 
 sealed class BotError(
-    override val conversationId: QualifiedId,
+    open val conversationId: QualifiedId,
     open val reason: String = "Core error"
-) : Exception(), Event {
+) : Exception() {
     /**
      * An event that can be ignored-skipped by the bot
      * For example, user added to the conversation, mentions, etc.

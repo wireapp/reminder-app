@@ -17,7 +17,7 @@ package com.wire.bots.application
 
 import arrow.core.Either
 import com.wire.bots.domain.event.BotError
-import com.wire.bots.domain.event.Event
+import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.event.EventProcessor
 import com.wire.integrations.jvm.WireAppSdk
 import com.wire.integrations.jvm.WireEventsHandlerSuspending
@@ -126,15 +126,15 @@ class MlsSdkClient(
     private fun processEvent(eventDTO: EventDTO) {
         try {
             logger.debug("Processing event: $eventDTO")
-            val eventResult: Either<BotError, Event> = EventMapper.fromEvent(eventDTO)
-            eventResult.fold(
+            val result: Either<BotError, Command> = EventMapper.fromEvent(eventDTO)
+            result.fold(
                 ifLeft = { error ->
                     logger.warn("Processing event with error: $error")
                     eventProcessor.process(error)
                 },
-                ifRight = { event ->
-                    logger.info("Processing event parsed to: $event")
-                    eventProcessor.process(event)
+                ifRight = { command ->
+                    logger.info("Processing event parsed to: $command")
+                    eventProcessor.process(command)
                 }
             )
         } catch (e: IllegalArgumentException) {

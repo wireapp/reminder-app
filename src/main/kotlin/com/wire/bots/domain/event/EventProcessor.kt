@@ -9,10 +9,10 @@ import com.wire.bots.domain.usecase.SaveReminderSchedule
 import org.slf4j.LoggerFactory
 
 /**
- * Process the event/event and acts accordingly, also handles errors
+ * Process the command and acts accordingly, also handles errors
  *
- * For example, if the event is "help", it will send a help message to the conversation, or
- * if the event is unknown, it will do nothing and send an error message to the conversation.
+ * For example, if the command is "help", it will send a help message to the conversation, or
+ * if the command is unknown, it will do nothing and send an error message to the conversation.
  */
 @DomainComponent
 class EventProcessor(
@@ -21,27 +21,23 @@ class EventProcessor(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun process(event: Event): Either<Throwable, Unit> =
-        when (event) {
-            is Command -> commandHandler.onEvent(event)
-            else -> Either.Left(
-                IllegalArgumentException("Unhandled event type: ${event::class.simpleName}")
-            )
-        }.mapLeft { unhandled ->
-            logger.error("Error processing event: $event", unhandled)
-            outgoingMessageRepository.sendMessage(
-                conversationId = event.conversationId,
-                messageContent = getErrorMessage(unhandled)
-            )
-            unhandled
-        }
+    fun process(command: Command): Either<Throwable, Unit> =
+        commandHandler.onEvent(command)
+            .mapLeft { unhandled ->
+                logger.error("Error processing command: $command", unhandled)
+                outgoingMessageRepository.sendMessage(
+                    conversationId = command.conversationId,
+                    messageContent = getErrorMessage(unhandled)
+                )
+                unhandled
+            }
 
     private fun getErrorMessage(error: Throwable): String =
         if (error is SaveReminderSchedule.MaxReminderJobsReached) {
             "❌ Maximum numbers of active reminders reached (currently ${error.max})." +
                 "Please delete some reminders first."
         } else {
-            "An error occurred while processing the event, please try again later."
+            "An error occurred while processing the command, please try again later."
         }
 
     fun process(error: BotError): Either<Throwable, Unit> =

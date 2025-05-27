@@ -8,7 +8,6 @@ import com.mdimension.jchronic.Options
 import com.mdimension.jchronic.tags.Pointer
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
-import com.wire.bots.domain.event.Event
 import com.wire.bots.domain.reminder.Reminder
 import io.github.yamilmedina.kron.NaturalKronParser
 import java.time.Instant
@@ -32,7 +31,7 @@ object ReminderMapper {
         conversationId: QualifiedId,
         task: String,
         schedule: String
-    ): Either<BotError, Event> =
+    ): Either<BotError, Command> =
         when {
             isRecurrentSchedule(schedule) && containsInvalidTimeTokens(schedule) -> {
                 BotError
