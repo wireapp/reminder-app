@@ -1,19 +1,17 @@
 package com.wire.bots.domain.reminder
 
 import arrow.core.Either
-import com.wire.bots.domain.PlainConversationId
+import com.wire.integrations.jvm.model.QualifiedId
 
 interface ReminderRepository {
     fun persistReminder(reminder: Reminder): Either<Throwable, Unit>
 
-    fun countRemindersByConversationId(conversationId: PlainConversationId): Long
+    fun countRemindersByConversationId(conversationId: QualifiedId): Long
 
-    fun getReminderOnConversationId(
-        conversationId: PlainConversationId
-    ): Either<Throwable, List<Reminder>>
+    fun getReminderOnConversationId(conversationId: QualifiedId): Either<Throwable, List<Reminder>>
 
     fun deleteReminder(
         reminderId: String,
-        conversationId: PlainConversationId
+        conversationId: QualifiedId
     ): Either<Throwable, Unit>
 }

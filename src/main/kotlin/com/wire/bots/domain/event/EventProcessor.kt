@@ -4,45 +4,40 @@ import arrow.core.Either
 import arrow.core.right
 import com.wire.bots.domain.DomainComponent
 import com.wire.bots.domain.event.handlers.CommandHandler
-import com.wire.bots.domain.event.handlers.SignalHandler
 import com.wire.bots.domain.message.OutgoingMessageRepository
 import com.wire.bots.domain.usecase.SaveReminderSchedule
 import org.slf4j.LoggerFactory
 
 /**
- * Process the event/event and acts accordingly, also handles errors
+ * Process the command and acts accordingly, also handles errors
  *
- * For example, if the event is "help", it will send a help message to the conversation, or
- * if the event is unknown, it will do nothing and send an error message to the conversation.
+ * For example, if the command is "help", it will send a help message to the conversation, or
+ * if the command is unknown, it will do nothing and send an error message to the conversation.
  */
 @DomainComponent
 class EventProcessor(
     val commandHandler: CommandHandler,
-    val signalHandler: SignalHandler,
     val outgoingMessageRepository: OutgoingMessageRepository
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun process(event: Event): Either<Throwable, Unit> =
-        when (event) {
-            is Command -> commandHandler.onEvent(event)
-            is Signal -> signalHandler.onEvent(event)
-        }.mapLeft { unhandled ->
-            logger.error("Error processing event: $event", unhandled)
-            outgoingMessageRepository.sendMessage(
-                conversationId = event.conversationId,
-                token = event.token,
-                messageContent = getErrorMessage(unhandled)
-            )
-            unhandled
-        }
+    fun process(command: Command): Either<Throwable, Unit> =
+        commandHandler.onEvent(command)
+            .mapLeft { unhandled ->
+                logger.error("Error processing command: $command", unhandled)
+                outgoingMessageRepository.sendMessage(
+                    conversationId = command.conversationId,
+                    messageContent = getErrorMessage(unhandled)
+                )
+                unhandled
+            }
 
     private fun getErrorMessage(error: Throwable): String =
         if (error is SaveReminderSchedule.MaxReminderJobsReached) {
             "❌ Maximum numbers of active reminders reached (currently ${error.max})." +
                 "Please delete some reminders first."
         } else {
-            "An error occurred while processing the event, please try again later."
+            "An error occurred while processing the command, please try again later."
         }
 
     fun process(error: BotError): Either<Throwable, Unit> =
@@ -61,7 +56,6 @@ class EventProcessor(
     private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> =
         outgoingMessageRepository.sendMessage(
             conversationId = error.conversationId,
-            token = error.token,
             messageContent = error.reason
         )
 }

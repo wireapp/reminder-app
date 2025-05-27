@@ -2,14 +2,13 @@ package com.wire.bots.application
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import com.wire.integrations.jvm.model.QualifiedId
 
 @Serializable
 data class EventDTO(
     val type: EventTypeDTO,
-    val botId: String,
     val userId: String? = null,
-    val token: String? = null,
-    val conversationId: String? = null,
+    val conversationId: QualifiedId,
     val text: TextContent? = null,
     val handle: String? = null,
     val locale: String? = null,

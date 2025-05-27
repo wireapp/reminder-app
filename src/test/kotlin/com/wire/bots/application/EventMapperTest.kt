@@ -2,13 +2,19 @@ package com.wire.bots.application
 
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
-import com.wire.bots.domain.event.Signal
 import com.wire.bots.domain.reminder.Reminder
 import com.wire.bots.shouldFail
 import com.wire.bots.shouldSucceed
+import com.wire.integrations.jvm.model.QualifiedId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
+import java.util.UUID
+
+internal val TEST_CONVERSATION_ID = QualifiedId(
+    UUID.fromString("00000000-000-0000-0000-000000000001"),
+    "domain"
+)
 
 class EventMapperTest {
     @Test
@@ -17,9 +23,7 @@ class EventMapperTest {
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent("not relevant")
             )
 
@@ -33,53 +37,12 @@ class EventMapperTest {
     }
 
     @Test
-    fun givenBotInitEvent_whenMapping_ThenReturnSignalBotInit() {
-        // given
-        val eventDTO =
-            EventDTO(
-                type = EventTypeDTO.BOT_REQUEST,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token"
-            )
-
-        // when
-        val event = EventMapper.fromEvent(eventDTO)
-
-        // then
-        event.shouldSucceed {
-            assertEquals(Signal.BotAdded("conversationId", "token"), it)
-        }
-    }
-
-    @Test
-    fun givenBotRemovedEvent_whenMapping_ThenReturnSignalBotInit() {
-        // given
-        val eventDTO =
-            EventDTO(
-                type = EventTypeDTO.BOT_REMOVED,
-                conversationId = "conversationId",
-                botId = "botId"
-            )
-
-        // when
-        val event = EventMapper.fromEvent(eventDTO)
-
-        // then
-        event.shouldSucceed {
-            assertEquals(Signal.BotRemoved("conversationId", ""), it)
-        }
-    }
-
-    @Test
     fun givenTextEvent_whenTextIsHelp_ThenReturnLegacyHelpCommand() {
         // given
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent("/help")
             )
 
@@ -88,7 +51,7 @@ class EventMapperTest {
 
         // then
         event.shouldSucceed {
-            assertEquals(Command.LegacyHelp("conversationId", "token"), it)
+            assertEquals(Command.LegacyHelp(TEST_CONVERSATION_ID), it)
         }
     }
 
@@ -98,9 +61,7 @@ class EventMapperTest {
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent("/remind help")
             )
 
@@ -109,7 +70,7 @@ class EventMapperTest {
 
         // then
         event.shouldSucceed {
-            assertEquals(Command.Help("conversationId", "token"), it)
+            assertEquals(Command.Help(TEST_CONVERSATION_ID), it)
         }
     }
 
@@ -119,9 +80,7 @@ class EventMapperTest {
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent(
                     """/remind to "join the refinement session" "tomorrow at 11:00"""".trimIndent()
                 )
@@ -148,9 +107,7 @@ class EventMapperTest {
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent(
                     """/remind to "join the daily stand up" "every monday at 10:00"""".trimIndent()
                 )
@@ -177,9 +134,7 @@ class EventMapperTest {
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent(
                     """/remind to "drink water" "every 1 hours"""".trimIndent()
                 )
@@ -204,9 +159,7 @@ class EventMapperTest {
         val eventDTO =
             EventDTO(
                 type = EventTypeDTO.NEW_TEXT,
-                conversationId = "conversationId",
-                botId = "botId",
-                token = "token",
+                conversationId = TEST_CONVERSATION_ID,
                 text = TextContent("""/remind to "drink water" "yesterday" """.trimIndent())
             )
 

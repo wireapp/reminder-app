@@ -10,17 +10,22 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 import java.util.Date
 
 class TimeParsingTest {
     @Test
     fun givenTomorrowIsGiven_thenTheDateTimeShouldMatchForNowPlusOneDay() {
         // given
-        val now = Date.from(Instant.now(Clock.systemDefaultZone()))
+        val now = Date.from(Instant.now(Clock.systemUTC()))
         val expected = now.toInstant().plus(1, ChronoUnit.DAYS)
 
         // when
-        val dateSpan = Chronic.parse("tomorrow", JCHRONIC_OPTS)
+        val options = Options(Pointer.PointerType.FUTURE)
+        options.now = Calendar.getInstance(
+            java.util.TimeZone.getTimeZone("UTC")
+        ).apply { time = now }
+        val dateSpan = Chronic.parse("tomorrow", options)
 
         // then
         with(dateSpan.beginCalendar) {
