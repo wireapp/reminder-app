@@ -46,7 +46,7 @@ class CommandHandler(
                 } else {
                     "The reminders in this conversation:\n" +
                         reminders.joinToString("\n") {
-                            "What: '${it.task}' at: ${
+                            "'${it.task}' at: ${
                                 when (it) {
                                     is Reminder.SingleReminder -> it.scheduledAt
                                     is Reminder.RecurringReminder -> CronInterpreter.cronToText(
@@ -90,7 +90,7 @@ class CommandHandler(
             } else {
                 outgoingMessageRepository.sendMessage(
                     conversationId = command.conversationId,
-                    messageContent = "The reminder with id '${command.reminderId}' was not found."
+                    messageContent = "❌ The reminder with id '${command.reminderId}' was not found."
                 )
             }
         }
@@ -143,16 +143,18 @@ class CommandHandler(
             /remind to "do something" "18/09/2025 at 09:45"
             /remind to "do something" "next monday at 17:00"
             ```
-            2. You can also create a recurring reminders, for example:
+            2. You can also create recurring reminders, for example:
             ```
             /remind to "Start the daily stand up" "every day at 10:00"
-            /remind to "Start the weekly stand up" "every friday at 10:00"
+            /remind to "Start the weekly stand up" "every weekday at 10:00"
+            /remind to "Start the weekly stand up" "every Monday at 10:00"
+            /remind to "Start the weekly stand up" "every MON, Tue, Friday at 10:00"
             ```
             3. You can list all the active reminders in the conversation with the following event:
             ```
             /remind list
             ```
-            4. And you can delete a reminder with the following event:
+            4. And you can delete a reminder with the following command:
             (you can get the <reminderId> from the `/remind list` command)
             ```
             /remind delete <reminderId>

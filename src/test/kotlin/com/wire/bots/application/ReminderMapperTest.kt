@@ -89,7 +89,7 @@ class ReminderMapperTest {
         result.shouldFail {
             assertInstanceOf(BotError.ReminderError::class.java, it)
             assertEquals(
-                BotError.ErrorType.PARSE_ERROR.message,
+                BotError.ErrorType.EMPTY_REMINDER_TASK.message,
                 (it as BotError.ReminderError).reason
             )
         }

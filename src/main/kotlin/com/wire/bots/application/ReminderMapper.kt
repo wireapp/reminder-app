@@ -29,8 +29,9 @@ object ReminderMapper {
         conversationId: QualifiedId,
         task: String,
         schedule: String
-    ): Either<BotError, Command> =
-        when {
+    ): Either<BotError, Command> {
+        ValidateReminder.validateTaskNotEmpty(task, conversationId)?.let { return it.left() }
+        return when {
             isRecurrentSchedule(schedule) && containsInvalidTimeTokens(schedule) -> {
                 BotError
                     .ReminderError(

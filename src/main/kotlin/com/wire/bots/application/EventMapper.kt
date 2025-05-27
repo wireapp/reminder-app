@@ -75,30 +75,30 @@ object EventMapper {
         val reminderArgs = args
             .substringAfter("to")
             .split('"', '“')
-            .filter { it.isNotBlank() }
-        return if (reminderArgs.size != 2) {
-            BotError
-                .Unknown(
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        if (reminderArgs.size != 2) {
+            return BotError
+                .ReminderError(
                     conversationId = conversationId,
-                    reason = COMMAND_HINT
+                    errorType = BotError.ErrorType.INVALID_REMINDER_USAGE
                 ).left()
-        } else {
-            val (task, schedule) = reminderArgs
-            ReminderMapper
-                .parseReminder(
+        } else if (reminderArgs[0].isBlank()) {
+            return BotError
+                .ReminderError(
                     conversationId = conversationId,
-                    task = task,
-                    schedule = schedule
-                ).mapLeft { error ->
-                    when (error) {
-                        is BotError.ReminderError -> error
-                        else -> BotError.Unknown(
-                            conversationId = conversationId,
-                            reason = COMMAND_HINT
-                        )
-                    }
-                }
+                    errorType = BotError.ErrorType.EMPTY_REMINDER_TASK
+                ).left()
         }
+        val (task, schedule) = reminderArgs
+        return ReminderMapper
+            .parseReminder(
+                conversationId = conversationId,
+                task = task,
+                schedule = schedule
+            ).mapLeft { error ->
+                error as? BotError.ReminderError ?: error("Unexpected error type: $error")
+            }
     }
 
     private fun parseDeleteCommand(
@@ -107,11 +107,10 @@ object EventMapper {
     ): Either<BotError, Command> {
         val reminderId = args.substringAfter("delete").trim()
         return if (reminderId.isBlank()) {
-            BotError
-                .Unknown(
-                    conversationId = conversationId,
-                    reason = "Please provide a reminder ID to delete."
-                ).left()
+            BotError.ReminderError(
+                conversationId = conversationId,
+                errorType = BotError.ErrorType.INVALID_REMINDER_ID
+            ).left()
         } else {
             Command
                 .DeleteReminder(

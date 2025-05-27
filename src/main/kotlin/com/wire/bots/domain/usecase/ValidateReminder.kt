@@ -12,7 +12,7 @@ object ValidateReminder {
         if (task.isBlank()) {
             BotError.ReminderError(
                 conversationId = conversationId,
-                errorType = BotError.ErrorType.PARSE_ERROR
+                errorType = BotError.ErrorType.EMPTY_REMINDER_TASK
             )
         } else {
             null

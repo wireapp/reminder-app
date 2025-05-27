@@ -56,6 +56,9 @@ class EventProcessor(
     private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> =
         outgoingMessageRepository.sendMessage(
             conversationId = error.conversationId,
-            messageContent = error.reason
+            messageContent = when (error) {
+                is BotError.ReminderError -> error.errorType.message
+                else -> error.reason
+            }
         )
 }
