@@ -104,6 +104,10 @@ sealed class BotError(
                 ```
                 /remind to "What" "When"
                 ```
+                For more examples, check the help command:
+                ```
+                /remind help
+                ```
                 """.trimIndent()
         )
     }
