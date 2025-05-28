@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     kotlin("jvm") version "2.1.20"
@@ -10,6 +11,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("io.quarkus")
+    id("com.gradleup.shadow") version "8.3.6"
 }
 
 repositories {
@@ -53,7 +55,7 @@ dependencies {
     implementation("com.rubiconproject.oss:jchronic:0.2.8")
     implementation("io.github.yamilmedina:natural-kron:2.0.0")
     implementation("io.arrow-kt:arrow-core:1.2.0-RC")
-    implementation("com.wire:wire-apps-jvm-sdk:0.0.7")
+    implementation("com.wire:wire-apps-jvm-sdk:0.0.8")
 
     // Test dependencies
     testImplementation("io.quarkus:quarkus-junit5")
@@ -107,4 +109,8 @@ tasks.withType<KotlinJvmCompile>().configureEach {
         jvmTarget.set(JvmTarget.JVM_17)
         javaParameters.set(true)
     }
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
 }
