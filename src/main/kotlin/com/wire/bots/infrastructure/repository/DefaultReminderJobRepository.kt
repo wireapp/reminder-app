@@ -105,7 +105,7 @@ class DefaultReminderJobRepository(
      */
     private fun getNextFireTimeForTrigger(
         trigger: Trigger,
-        maxNextFireSize: Int = 5
+        maxNextFireSize: Int = MAX_NEXT_FIRE_SIZE
     ): List<Date> {
         val runs: MutableList<Date> = ArrayList()
         var next = trigger.nextFireTime
