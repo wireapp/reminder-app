@@ -126,16 +126,13 @@ class CommandHandler(
 
     companion object {
         fun createLegacyHelpMessage(): String =
-            """
-            Hi, I'm the Remind App.
-            Please use my specific help event **`/remind help`** to get more information about how to use me.
-            """.trimIndent()
+            "**Hi, I\\'m the Remind App.**\nPlease use my specific help command\n" +
+                "```\n/remind help\n```\n"
 
         fun createHelpMessage(): String =
             """
             **Hi, I'm the Remind App.**
             **I can help you to create reminders for your conversations, or yourself.**
-            
             1. You can create one time reminders, for example:
             ```
             /remind to "do something" "in 5 minutes"
@@ -150,12 +147,12 @@ class CommandHandler(
             /remind to "Start the weekly stand up" "every Monday at 10:00"
             /remind to "Start the weekly stand up" "every MON, Tue, Friday at 10:00"
             ```
-            3. You can list all the active reminders in the conversation with the following event:
+            3. You can list all the active reminders in the conversation with the following command:
             ```
             /remind list
             ```
-            4. And you can delete a reminder with the following command:
-            (you can get the <reminderId> from the `/remind list` command)
+            4. You can delete a reminder with the following command:
+            (Get the <reminderId> from the `/remind list` command)
             ```
             /remind delete <reminderId>
             ```
