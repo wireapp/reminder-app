@@ -65,7 +65,6 @@ object ReminderMapper {
                 Options(Pointer.PointerType.FUTURE)
             )
             val parsedDate = parsedSchedule.beginCalendar.toInstant()
-            // Validate scheduled time is in the future
             ValidateReminder.validateScheduledTimeInFuture(
                 parsedDate,
                 conversationId
