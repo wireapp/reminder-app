@@ -72,7 +72,7 @@ object EventMapper {
         conversationId: QualifiedId,
         args: String
     ): Either<BotError, Command> {
-        val regex = Regex("[\"“]([^\"“]*)[\"“]")
+        val regex = Regex("[\"“”]([^\"“”]*)[\"“”]")
         val matches = regex.findAll(args.substringAfter("to"))
             .map { it.groupValues[1] }
             .toList()

@@ -172,4 +172,143 @@ class EventMapperTest {
             assertEquals(BotError.ErrorType.DATE_IN_PAST, (it as BotError.ReminderError).errorType)
         }
     }
+
+    @Test
+    fun givenTextEvent_whenTextIsList_ThenReturnListRemindersCommand() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind list")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldSucceed {
+            assertEquals(Command.ListReminders(TEST_CONVERSATION_ID), it)
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsDeleteWithValidId_ThenReturnDeleteReminderCommand() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind delete 12345")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldSucceed {
+            assertEquals(Command.DeleteReminder(TEST_CONVERSATION_ID, "12345"), it)
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsDeleteWithBlankId_ThenRaiseInvalidReminderIdError() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind delete   ")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.INVALID_REMINDER_ID,
+                (it as BotError.ReminderError).errorType
+            )
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsMalformedReminder_ThenRaiseInvalidReminderUsage() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind to \"\" \"tomorrow\"")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.EMPTY_REMINDER_TASK,
+                (it as BotError.ReminderError).errorType
+            )
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsMalformedReminderWithEmptyTime_ThenRaiseInvalidReminderUsage() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind to \"task\" \"\"")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.INVALID_REMINDER_USAGE,
+                (it as BotError.ReminderError).errorType
+            )
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsMalformedReminderWithOneArg_ThenRaiseInvalidReminderUsage() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind to \"task\"")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.INVALID_REMINDER_USAGE,
+                (it as BotError.ReminderError).errorType
+            )
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsMalformedReminderWithNoQuotes_ThenRaiseInvalidReminderUsage() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind to task tomorrow")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.INVALID_REMINDER_USAGE,
+                (it as BotError.ReminderError).errorType
+            )
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextIsUnknownCommand_ThenReturnUnknownError() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind foo")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldFail {
+            assertInstanceOf(BotError.Unknown::class.java, it)
+        }
+    }
+
+    @Test
+    fun givenTextEvent_whenTextHasExtraSpacesAndMixedQuotes_ThenParseCorrectly() {
+        val eventDTO = EventDTO(
+            type = EventTypeDTO.NEW_TEXT,
+            conversationId = TEST_CONVERSATION_ID,
+            text = TextContent("/remind   to   \"task\"   “tomorrow at 10:00”   ")
+        )
+        val event = EventMapper.fromEvent(eventDTO)
+        event.shouldSucceed {
+            assertInstanceOf(Command.NewReminder::class.java, it)
+            val reminder = (it as Command.NewReminder).reminder
+            assertEquals("task", reminder.task)
+        }
+    }
 }
