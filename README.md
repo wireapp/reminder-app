@@ -14,7 +14,7 @@ This is an app that can create reminders for conversation, and send a message wh
 - Delete reminders
 
 > [!IMPORTANT]  
-> As of now, the bot only supports a maximum of 5 active reminders per group, and recurrent reminders are supported only up to 5 repetitions.
+> As of now, the bot only supports a maximum of 5 active reminders per group.
 
 ## Getting started
 
@@ -131,7 +131,4 @@ If you want to learn more about building native executables, please consult http
 - JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
 
 ## Roadmap:
-- **Increase number of active reminders:** Currently, the app only supports a maximum of 3 active reminders per group.
-- **Add support for multiple weekday reminders:** for example "every monday, tuesday and friday at 13:00".
-- **Add support for multiple weekday definition:** for example Monday could be: monday, Monday, Mon, mon., MON etc.
 - **Add buttons to delete reminders:** to make it easier for users to manage their reminders.
