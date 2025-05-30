@@ -37,7 +37,7 @@ class EventProcessor(
             "❌ Maximum numbers of active reminders reached (currently ${error.max})." +
                 "Please delete some reminders first."
         } else {
-            "An error occurred while processing the command, please try again later."
+            "❌ An error occurred while processing the command, please try again later."
         }
 
     fun process(error: BotError): Either<Throwable, Unit> =
@@ -56,6 +56,9 @@ class EventProcessor(
     private fun handleErrorMessage(error: BotError): Either<Throwable, Unit> =
         outgoingMessageRepository.sendMessage(
             conversationId = error.conversationId,
-            messageContent = error.reason
+            messageContent = when (error) {
+                is BotError.ReminderError -> error.errorType.message
+                else -> error.reason
+            }
         )
 }

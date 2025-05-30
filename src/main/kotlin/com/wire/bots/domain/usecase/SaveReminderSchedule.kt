@@ -44,9 +44,9 @@ class SaveReminderSchedule(
 
     data class MaxReminderJobsReached(
         val max: Int = MAX_REMINDER_JOBS
-    ) : Throwable("Max reminder jobs reached: $max")
+    ) : Throwable("❌ Max reminder jobs reached: $max")
 
     companion object {
-        private const val MAX_REMINDER_JOBS = 3
+        private const val MAX_REMINDER_JOBS = 5
     }
 }

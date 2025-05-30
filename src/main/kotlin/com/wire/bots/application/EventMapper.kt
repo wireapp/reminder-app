@@ -72,32 +72,35 @@ object EventMapper {
         conversationId: QualifiedId,
         args: String
     ): Either<BotError, Command> {
-        val reminderArgs = args
-            .substringAfter("to")
-            .split('"', '“')
-            .filter { it.isNotBlank() }
-        return if (reminderArgs.size != 2) {
-            BotError
-                .Unknown(
-                    conversationId = conversationId,
-                    reason = COMMAND_HINT
-                ).left()
-        } else {
-            val (task, schedule) = reminderArgs
-            ReminderMapper
-                .parseReminder(
-                    conversationId = conversationId,
-                    task = task,
-                    schedule = schedule
-                ).mapLeft { error ->
-                    when (error) {
-                        is BotError.ReminderError -> error
-                        else -> BotError.Unknown(
-                            conversationId = conversationId,
-                            reason = COMMAND_HINT
-                        )
+        val regex = Regex("[\"“”]([^\"“”]*)[\"“”]")
+        val matches = regex.findAll(args.substringAfter("to"))
+            .map { it.groupValues[1] }
+            .toList()
+        return when {
+            matches.size < 2 -> BotError.ReminderError(
+                conversationId = conversationId,
+                errorType = BotError.ErrorType.INVALID_REMINDER_USAGE
+            ).left()
+            matches[0].isBlank() -> BotError.ReminderError(
+                conversationId = conversationId,
+                errorType = BotError.ErrorType.EMPTY_REMINDER_TASK
+            ).left()
+            matches[1].isBlank() -> BotError.ReminderError(
+                conversationId = conversationId,
+                errorType = BotError.ErrorType.INVALID_REMINDER_USAGE
+            ).left()
+            else -> {
+                val task = matches[0]
+                val schedule = matches[1]
+                ReminderMapper
+                    .parseReminder(
+                        conversationId = conversationId,
+                        task = task,
+                        schedule = schedule
+                    ).mapLeft { error ->
+                        error as? BotError.ReminderError ?: error("❌ Unexpected error type: $error")
                     }
-                }
+            }
         }
     }
 
@@ -107,11 +110,10 @@ object EventMapper {
     ): Either<BotError, Command> {
         val reminderId = args.substringAfter("delete").trim()
         return if (reminderId.isBlank()) {
-            BotError
-                .Unknown(
-                    conversationId = conversationId,
-                    reason = "Please provide a reminder ID to delete."
-                ).left()
+            BotError.ReminderError(
+                conversationId = conversationId,
+                errorType = BotError.ErrorType.INVALID_REMINDER_ID
+            ).left()
         } else {
             Command
                 .DeleteReminder(
@@ -127,9 +129,9 @@ internal val COMMAND_HINT =
     """
     Unknown command, valid options are:
     ```
-    > /remind help
-    > /remind list
-    > /remind to "what" "when"
-    > /remind delete <reminderId>
+    /remind help
+    /remind list
+    /remind to "what" "when"
+    /remind delete <reminderId>
     ```
     """.trimIndent()

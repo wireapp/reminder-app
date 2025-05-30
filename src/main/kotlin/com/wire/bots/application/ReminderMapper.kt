@@ -9,17 +9,15 @@ import com.mdimension.jchronic.tags.Pointer
 import com.wire.bots.domain.event.BotError
 import com.wire.bots.domain.event.Command
 import com.wire.bots.domain.reminder.Reminder
-import io.github.yamilmedina.kron.NaturalKronParser
-import java.time.Instant
 import java.util.UUID
 import com.wire.integrations.jvm.model.QualifiedId
+import com.wire.bots.domain.usecase.ValidateReminder
+import com.wire.bots.infrastructure.utils.CronInterpreter
 
 object ReminderMapper {
     private val INVALID_TIME_TOKENS = listOf("hour", "minute", "second")
     private val VALID_RECURRENT_TOKENS = listOf("every")
     // todo: expand later, each, daily, weekly, etc.
-
-    private val naturalKronParser = NaturalKronParser()
 
     private fun isRecurrentSchedule(schedule: String): Boolean =
         VALID_RECURRENT_TOKENS.any { schedule.contains(it) }
@@ -31,8 +29,9 @@ object ReminderMapper {
         conversationId: QualifiedId,
         task: String,
         schedule: String
-    ): Either<BotError, Command> =
-        when {
+    ): Either<BotError, Command> {
+        ValidateReminder.validateTaskNotEmpty(task, conversationId)?.let { return it.left() }
+        return when {
             isRecurrentSchedule(schedule) && containsInvalidTimeTokens(schedule) -> {
                 BotError
                     .ReminderError(
@@ -40,7 +39,6 @@ object ReminderMapper {
                         errorType = BotError.ErrorType.INCREMENT_IN_TIMEUNIT
                     ).left()
             }
-
             VALID_RECURRENT_TOKENS.any { schedule.contains(it) } -> {
                 parseRecurrentTask(
                     conversationId = conversationId,
@@ -48,13 +46,13 @@ object ReminderMapper {
                     schedule = schedule
                 )
             }
-
             else -> parseSingleTask(
                 conversationId = conversationId,
                 task = task,
                 schedule = schedule
             )
         }
+    }
 
     private fun parseSingleTask(
         schedule: String,
@@ -67,13 +65,10 @@ object ReminderMapper {
                 Options(Pointer.PointerType.FUTURE)
             )
             val parsedDate = parsedSchedule.beginCalendar.toInstant()
-            if (parsedDate.isBefore(Instant.now())) {
-                return BotError
-                    .ReminderError(
-                        conversationId = conversationId,
-                        errorType = BotError.ErrorType.DATE_IN_PAST
-                    ).left()
-            }
+            ValidateReminder.validateScheduledTimeInFuture(
+                parsedDate,
+                conversationId
+            )?.let { return it.left() }
             Command
                 .NewReminder(
                     conversationId = conversationId,
@@ -106,7 +101,7 @@ object ReminderMapper {
                         conversationId = conversationId,
                         taskId = UUID.randomUUID().toString(),
                         task = task,
-                        scheduledCron = naturalKronParser.parse(schedule)
+                        scheduledCron = CronInterpreter.textToCron(schedule)
                     )
                 ).right()
         }.getOrElse {

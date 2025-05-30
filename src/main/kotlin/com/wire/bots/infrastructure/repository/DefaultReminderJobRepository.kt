@@ -105,7 +105,7 @@ class DefaultReminderJobRepository(
      */
     private fun getNextFireTimeForTrigger(
         trigger: Trigger,
-        maxNextFireSize: Int = 3
+        maxNextFireSize: Int = MAX_NEXT_FIRE_SIZE
     ): List<Date> {
         val runs: MutableList<Date> = ArrayList()
         var next = trigger.nextFireTime
@@ -120,6 +120,6 @@ class DefaultReminderJobRepository(
     companion object {
         private const val SECONDS_BEFORE_WARMUP = 10L
         private const val SINGLE_TIME_COUNT_JOB = 1
-        private const val MAX_NEXT_FIRE_SIZE = 3
+        private const val MAX_NEXT_FIRE_SIZE = 5
     }
 }

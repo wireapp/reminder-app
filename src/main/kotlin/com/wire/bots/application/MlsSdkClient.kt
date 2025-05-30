@@ -58,7 +58,8 @@ class MlsSdkClient(
                 apiHost = apiHost,
                 cryptographyStoragePassword = "myDummyPassword",
                 wireEventsHandler = object : WireEventsHandlerSuspending() {
-                    override suspend fun onMessage(wireMessage: WireMessage.Text) =
+                    override suspend fun onMessage(wireMessage: WireMessage.Text) {
+                        logger.info("Received Text Message : $wireMessage")
                         processEvent(
                             EventDTO(
                                 type = EventTypeDTO.NEW_TEXT,
@@ -67,6 +68,15 @@ class MlsSdkClient(
                                 text = wireMessage.text.let { TextContent(it) }
                             )
                         )
+
+                        // Sending a Read Receipt for the received message
+                        val receipt = WireMessage.Receipt.create(
+                            conversationId = wireMessage.conversationId,
+                            type = WireMessage.Receipt.Type.READ,
+                            messages = listOf(wireMessage.id.toString())
+                        )
+                        manager.sendMessageSuspending(message = receipt)
+                    }
 
                     override suspend fun onAsset(wireMessage: WireMessage.Asset) {
                         logger.info("Received Asset Message: $wireMessage")

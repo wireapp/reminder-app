@@ -5,7 +5,7 @@
 > **Note:** This app is in development and not ready for production use.
 
 ## Overview
-This is an app that can create reminders for you and your group, and send you a message when the reminder is due.
+This is an app that can create reminders for conversation, and send a message when the reminder is due.
 
 ## **Features**
 - Set one-time reminders
@@ -14,7 +14,7 @@ This is an app that can create reminders for you and your group, and send you a 
 - Delete reminders
 
 > [!IMPORTANT]  
-> As of now, the bot only supports a maximum of 3 active reminders per group, and recurrent reminders are supported only up to 5 repetitions.
+> As of now, the bot only supports a maximum of 5 active reminders per group.
 
 ## Getting started
 
@@ -34,13 +34,15 @@ This is an app that can create reminders for you and your group, and send you a 
 
 ### Set reminders examples:
 
-|                    | Command      | What                                           | When                      |
-|--------------------|--------------|------------------------------------------------|---------------------------|
-| one time reminder  | `/remind to` | `"Fill in your invoices by end of day"`        | `"tomorrow at 17:30"`     |
-| one time reminder  | `/remind to` | `"Reply to HR email"`                          | `"in 10 minutes"`         |
-| one time reminder  | `/remind to` | `"Travel back in time to not develop the bot"` | `"11/11/2150"`            |
-| recurrent reminder | `/remind to` | `"Join the daily stand-up"`                    | `"every day at 10:00"`    |
-| recurrent reminder | `/remind to` | `"Empty the unread emails"`                    | `"every friday at 17:00"` |
+|                    | Command      | What                                           | When                                |
+|--------------------|--------------|------------------------------------------------|-------------------------------------|
+| one time reminder  | `/remind to` | `"Fill in your invoices by end of day"`        | `"tomorrow at 17:30"`               |
+| one time reminder  | `/remind to` | `"Fill in your invoices by end of day"`        | `"next Tue at 17:30"`               |
+| one time reminder  | `/remind to` | `"Reply to HR email"`                          | `"in 10 minutes"`                   |
+| one time reminder  | `/remind to` | `"Travel back in time to not develop the bot"` | `"11/11/2150"`                      |
+| recurrent reminder | `/remind to` | `"Join the daily stand-up"`                    | `"every day at 10:00"`              |
+| recurrent reminder | `/remind to` | `"Empty the unread emails"`                    | `"every Friday at 17:00"`           |
+| recurrent reminder | `/remind to` | `"Empty the unread emails"`                    | `"every Mon, TUE, friday at 17:00"` |
 
 > [!TIP]  
 > You can set reminders for yourself. To do so, you can use the commands in a private conversation, a 1:1 with the bot.
@@ -129,7 +131,4 @@ If you want to learn more about building native executables, please consult http
 - JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
 
 ## Roadmap:
-- **Increase number of active reminders:** Currently, the app only supports a maximum of 3 active reminders per group.
-- **Add support for multiple weekday reminders:** for example "every monday, tuesday and friday at 13:00".
-- **Add support for multiple weekday definition:** for example Monday could be: monday, Monday, Mon, mon., MON etc.
 - **Add buttons to delete reminders:** to make it easier for users to manage their reminders.

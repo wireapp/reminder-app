@@ -78,4 +78,46 @@ class ReminderMapperTest {
             )
         }
     }
+
+    @Test
+    fun givenAnEmptyTask_whenParsingReminder_thenRaiseParseError() {
+        val result = ReminderMapper.parseReminder(
+            TEST_CONVERSATION_ID,
+            "   ",
+            "tomorrow at 10:00"
+        )
+        result.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.EMPTY_REMINDER_TASK.message,
+                (it as BotError.ReminderError).reason
+            )
+        }
+    }
+
+    @Test
+    fun givenAnInvalidDate_whenParsingReminder_thenRaiseParseError() {
+        val result = ReminderMapper.parseReminder(
+            TEST_CONVERSATION_ID,
+            "task",
+            "31.02.2025 at 10:00"
+        )
+        result.shouldFail {
+            assertInstanceOf(BotError.ReminderError::class.java, it)
+            assertEquals(
+                BotError.ErrorType.PARSE_ERROR.message,
+                (it as BotError.ReminderError).reason
+            )
+        }
+    }
+
+    @Test
+    fun givenAValidReminder_whenParsingReminder_thenSucceeds() {
+        val result = ReminderMapper.parseReminder(
+            TEST_CONVERSATION_ID,
+            "Buy milk",
+            "tomorrow at 10:00"
+        )
+        assert(result.isRight())
+    }
 }
